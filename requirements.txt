@@ -1,0 +1,13 @@
+# Day 1 Requirements for AI Guardian (SentinelAI)
+# Verified working configuration for Python 3.14 on Windows
+# Note: Specific versions pinned to ensure Windows Application Control / Smart App Control compatibility
+
+pandas==3.0.6
+numpy>=1.26.0
+scikit-learn>=1.3.0
+matplotlib>=3.8.0
+seaborn>=0.13.0
+joblib>=1.3.0
+pyarrow==25.0.1
+xxhash==4.0.1
+datasets>=2.16.0

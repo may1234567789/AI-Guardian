@@ -1,0 +1,222 @@
+{
+  "dataset_name": "cyberec/Prompt-injection-dataset",
+  "configuration": "core",
+  "total_records": 6274,
+  "split_counts": {
+    "train": 4391,
+    "validation": 941,
+    "test": 942
+  },
+  "null_summary": {
+    "text": 0,
+    "label": 0,
+    "category": 0,
+    "source": 0,
+    "severity": 0,
+    "group_id": 0,
+    "augmented": 0,
+    "tags": 0,
+    "split": 0
+  },
+  "exact_text_duplicates_overall": 0,
+  "label_consistency": {
+    "contradictory_text_count": 0,
+    "inconsistent_samples": [],
+    "is_consistent": true
+  },
+  "class_balance": {
+    "train": {
+      "malicious_1": 2650,
+      "benign_0": 1741,
+      "malicious_ratio": 0.6035
+    },
+    "validation": {
+      "malicious_1": 534,
+      "benign_0": 407,
+      "malicious_ratio": 0.5675
+    },
+    "test": {
+      "malicious_1": 552,
+      "benign_0": 390,
+      "malicious_ratio": 0.586
+    }
+  },
+  "text_statistics": {
+    "overall": {
+      "character_length": {
+        "min": 10,
+        "max": 7009,
+        "mean": 143.22,
+        "median": 56.0,
+        "std": 361.6,
+        "p01": 17.730000000000004,
+        "p05": 28.0,
+        "p25": 44.0,
+        "p75": 95.75,
+        "p95": 462.6999999999989,
+        "p99": 2003.8899999999967
+      },
+      "word_count": {
+        "min": 1,
+        "max": 1930,
+        "mean": 20.03,
+        "median": 8.0,
+        "std": 52.13,
+        "p95": 68.34999999999945,
+        "p99": 221.0799999999981
+      },
+      "extreme_long_prompts_count": 64,
+      "short_prompts_count": 94
+    },
+    "by_split": {
+      "train": {
+        "character_length": {
+          "min": 10,
+          "max": 7009,
+          "mean": 142.98,
+          "median": 56.0,
+          "std": 364.36,
+          "p01": 18.0,
+          "p05": 27.0,
+          "p25": 44.0,
+          "p75": 95.0,
+          "p95": 469.5,
+          "p99": 1989.100000000004
+        },
+        "word_count": {
+          "min": 1,
+          "max": 1930,
+          "mean": 20.21,
+          "median": 8.0,
+          "std": 56.09,
+          "p95": 68.0,
+          "p99": 266.9000000000069
+        },
+        "extreme_long_prompts_count": 43,
+        "short_prompts_count": 65
+      },
+      "validation": {
+        "character_length": {
+          "min": 12,
+          "max": 3972,
+          "mean": 143.46,
+          "median": 55.0,
+          "std": 358.12,
+          "p01": 18.0,
+          "p05": 29.0,
+          "p25": 43.0,
+          "p75": 98.0,
+          "p95": 451.0,
+          "p99": 2079.8000000000006
+        },
+        "word_count": {
+          "min": 1,
+          "max": 572,
+          "mean": 19.44,
+          "median": 8.0,
+          "std": 39.19,
+          "p95": 68.0,
+          "p99": 183.60000000000002
+        },
+        "extreme_long_prompts_count": 12,
+        "short_prompts_count": 14
+      },
+      "test": {
+        "character_length": {
+          "min": 10,
+          "max": 4218,
+          "mean": 144.11,
+          "median": 56.5,
+          "std": 352.36,
+          "p01": 17.0,
+          "p05": 28.0,
+          "p25": 44.0,
+          "p75": 95.0,
+          "p95": 456.7999999999997,
+          "p99": 1929.9600000000014
+        },
+        "word_count": {
+          "min": 1,
+          "max": 769,
+          "mean": 19.78,
+          "median": 8.0,
+          "std": 43.62,
+          "p95": 69.94999999999993,
+          "p99": 209.7700000000001
+        },
+        "extreme_long_prompts_count": 9,
+        "short_prompts_count": 15
+      }
+    },
+    "by_class": {
+      "benign_0": {
+        "character_length": {
+          "min": 14,
+          "max": 2158,
+          "mean": 70.04,
+          "median": 48.0,
+          "std": 168.65,
+          "p01": 24.0,
+          "p05": 30.0,
+          "p25": 42.0,
+          "p75": 54.0,
+          "p95": 79.15000000000009,
+          "p99": 604.7100000000019
+        },
+        "word_count": {
+          "min": 3,
+          "max": 316,
+          "mean": 10.76,
+          "median": 7.0,
+          "std": 25.77,
+          "p95": 13.0,
+          "p99": 106.0
+        },
+        "extreme_long_prompts_count": 12,
+        "short_prompts_count": 7
+      },
+      "malicious_1": {
+        "character_length": {
+          "min": 10,
+          "max": 7009,
+          "mean": 192.94,
+          "median": 78.0,
+          "std": 440.65,
+          "p01": 15.0,
+          "p05": 24.0,
+          "p25": 51.0,
+          "p75": 151.0,
+          "p95": 634.5,
+          "p99": 2175.2500000000023
+        },
+        "word_count": {
+          "min": 1,
+          "max": 1930,
+          "mean": 26.33,
+          "median": 12.0,
+          "std": 63.36,
+          "p95": 84.0,
+          "p99": 305.6500000000001
+        },
+        "extreme_long_prompts_count": 52,
+        "short_prompts_count": 87
+      }
+    }
+  },
+  "group_splitting": {
+    "total_unique_groups": 6274,
+    "leakage_check": {
+      "train_val_group_overlap": 0,
+      "train_test_group_overlap": 0,
+      "val_test_group_overlap": 0
+    },
+    "is_group_isolated": true
+  },
+  "generated_charts": [
+    "class_distribution.png",
+    "text_length_distribution.png",
+    "category_distribution.png",
+    "severity_distribution.png",
+    "data_quality_summary.png"
+  ]
+}
