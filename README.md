@@ -5,7 +5,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Day%201%20Completed-orange.svg)](#current-implementation-status)
+[![Status](https://img.shields.io/badge/Status-Day%202%20Completed-brightgreen.svg)](#current-implementation-status)
 
 ---
 
@@ -44,23 +44,33 @@ SentinelAI/
 │   │   ├── core_validation.parquet
 │   │   ├── core_test.parquet
 │   │   └── ...
-│   ├── artifacts/              # Serialized models and vectorizers (Day 2+)
-│   ├── reports/                # Visual charts and machine-readable JSON summaries
-│   │   ├── class_distribution.png
-│   │   ├── text_length_distribution.png
-│   │   ├── category_distribution.png
-│   │   ├── severity_distribution.png
-│   │   ├── data_quality_summary.png
-│   │   └── data_quality_summary.json
+│   ├── artifacts/              # Serialized models and vectorizers
+│   │   ├── prompt_injection_logreg.joblib  # Trained TF-IDF + Logistic Regression pipeline
+│   │   └── model_metadata.json             # Hyperparameters, metrics, and limitations
+│   ├── reports/                # Visual charts, markdown analyses, and JSON summaries
+│   │   ├── confusion_matrix.png            # Day 2: Test set confusion matrix heatmap
+│   │   ├── roc_curve.png                   # Day 2: Receiver operating characteristic curve
+│   │   ├── metrics_summary.png             # Day 2: Default vs. calibrated threshold metrics
+│   │   ├── error_analysis.md               # Day 2: In-depth qualitative error audit
+│   │   ├── test_evaluation_summary.json    # Day 2: Complete machine-readable test metrics
+│   │   ├── class_distribution.png          # Day 1: Class distribution breakdown
+│   │   ├── text_length_distribution.png    # Day 1: Text length density plots
+│   │   └── ...
 │   ├── notebooks/              # Exploratory research notebooks
+│   ├── preprocess_data.py      # Leakage-safe preprocessing & cross-split isolation
+│   ├── train.py                # Pipeline construction, training, threshold tuning & serialization
+│   ├── evaluate.py             # Held-out test set evaluation & chart generation
+│   ├── error_analysis.py       # Empirical false positive / false negative diagnostic
+│   ├── test_model.py           # Automated model unit & smoke tests (7/7 passing)
 │   ├── inspect_dataset.py      # Schema discovery, null/duplicate checks, leakage audits
 │   ├── analyze_dataset.py      # In-depth EDA, statistical profiling, and visualizations
 │   └── test_data_pipeline.py   # Automated unit tests for inspection & analysis logic
 ├── backend/                    # Reserved for FastAPI Gateway (Planned)
 ├── frontend/                   # Reserved for React Firewall Dashboard (Planned)
 ├── docs/                       # Research documentation and empirical reports
-│   ├── day1_dataset_report.md  # Complete empirical audit report
-│   └── day1_research_notes.md  # Theoretical foundations and threat taxonomy
+│   ├── day1_dataset_report.md  # Day 1 empirical dataset quality audit
+│   ├── day1_research_notes.md  # Day 1 theoretical foundations and threat taxonomy
+│   └── day2_model_report.md    # Day 2 complete baseline model training and evaluation report
 ├── requirements.txt            # Pinned, tested dependencies for local environment
 ├── .gitignore                  # Git exclusion rules
 └── README.md                   # Project overview and instructions
@@ -68,25 +78,45 @@ SentinelAI/
 
 ---
 
-## 4. Current Implementation Status (Day 1 Complete)
+## 4. Current Implementation Status (Day 1 & Day 2 Complete)
 
-* [x] **Project Structure & Environment:** Clean modular architecture initialized; local virtual environment (`venv`) established and verified.
-* [x] **Dependency Management:** Day 1 dependencies installed and tested on Python 3.14 under Windows Application Control / Smart App Control constraints.
-* [x] **Dataset Source Discovery:** Hugging Face dataset `cyberec/Prompt-injection-dataset` verified (Apache 2.0 license, Croissant 1.1 metadata).
-* [x] **Schema & Split Inspection:** Evaluated `core` (6,274 samples) and `full` (15,919 samples) partitions. Zero nulls, zero blanks, zero cross-split leakage.
-* [x] **Data Quality & Leakage Auditing:** Group-aware isolation confirmed; empirical length distribution disparity cataloged.
-* [x] **Local Storage:** Full Parquet and CSV archives generated in `ml/data/`.
-* [x] **Reporting & Visualizations:** Five high-resolution visual reports and JSON scorecard created in `ml/reports/`.
-* [x] **Unit Testing:** Automated unit tests in `ml/test_data_pipeline.py` executing cleanly (6/6 passing).
+* [x] **Day 1 - Dataset Understanding & Audits:** Schema discovery, data quality inspection (zero nulls, zero empty strings), cross-split leakage audit, length disparity discovery, local Parquet/CSV storage, and 5 visual reports.
+* [x] **Day 2 - Preprocessing Pipeline:** Leakage-safe, security-preserving preprocessing in `ml/preprocess_data.py`. Verified zero cross-split overlap across train, validation, and test partitions.
+* [x] **Day 2 - Baseline ML Model Training:** Built and trained an end-to-end scikit-learn `Pipeline` (TF-IDF Vectorizer with unigrams/bigrams and sublinear TF + Logistic Regression with class balancing) in `ml/train.py`. Fits in 0.136s.
+* [x] **Day 2 - Model Artifact Serialization:** Complete pipeline saved with Joblib to `ml/artifacts/prompt_injection_logreg.joblib` (162.3 KB). Full hyperparameters, split provenance, environment details, and security limitations recorded in `ml/artifacts/model_metadata.json`.
+* [x] **Day 2 - Held-Out Test Set Evaluation:** Evaluated on 942 test examples in `ml/evaluate.py`. Default threshold (0.50) achieved **95.22% accuracy, 97.46% recall, 94.55% precision, 0.9599 F1, and 0.9937 ROC-AUC**.
+* [x] **Day 2 - Validation Threshold Calibration:** Calibrated operating threshold to 0.71, slashing False Positives from 31 down to 7 (FPR = 1.79%, precision = 98.64%, recall = 92.21%).
+* [x] **Day 2 - Latency Profiling:** Verified sub-millisecond CPU inference: **0.452 ms** mean single-request latency, 0.636 ms P95 latency.
+* [x] **Day 2 - Visual Reporting:** Publication-ready charts generated in `ml/reports/`: `confusion_matrix.png`, `roc_curve.png`, and `metrics_summary.png`.
+* [x] **Day 2 - Error Analysis:** In-depth qualitative audit in `ml/reports/error_analysis.md` analyzing false alarms on long benign prompts and bypasses on social-engineering roleplay ("grandma exploit").
+* [x] **Day 2 - Automated Unit Testing:** 7 automated test suites passing in `ml/test_model.py` (model loading, step integrity, predict_proba calibration, batch/single inference, empty input edge cases, and smoke tests).
 
 ---
 
-## 5. Setup & Execution Instructions
+## 5. Measured Baseline Performance (Day 2 Empirical Results)
+
+Evaluated strictly on the held-out test split (`core_test.parquet`, $N = 942$: 390 Benign, 552 Malicious):
+
+| Metric | Default Threshold (0.50) | Validation-Calibrated Threshold (0.71) | Security Impact |
+| :--- | :--- | :--- | :--- |
+| **Accuracy** | **95.22%** | **94.69%** | Robust baseline accuracy across both splits |
+| **Precision** | **94.55%** | **98.64%** | Calibrated threshold minimizes user friction |
+| **Recall (Detection Rate)** | **97.46%** (538 / 552) | **92.21%** (509 / 552) | Default captures 97.5% of attack attempts |
+| **F1-Score** | **0.9599** | **0.9532** | Strong harmonic performance |
+| **ROC-AUC** | **0.9937** | **0.9937** | Excellent class separability |
+| **False Positive Rate (FPR)** | **7.95%** (31 / 390) | **1.79%** (7 / 390) | **77.4% reduction in false alarms** |
+| **False Negative Rate (FNR)** | **2.54%** (14 / 552) | **7.79%** (43 / 552) | Trade-off for enterprise low-friction profile |
+| **Single-Request Mean Latency** | **0.452 ms** | **0.452 ms** | Sub-millisecond CPU inline inspection |
+| **Single-Request P95 Latency** | **0.636 ms** | **0.636 ms** | Deterministic tail latency on commodity CPU |
+
+---
+
+## 6. Setup & Execution Instructions
 
 ### Prerequisites
 * Windows 10/11, Linux, or macOS
-* Python 3.10+ (tested up to Python 3.14)
-* 4 GB+ RAM (optimized for 8 GB RAM / Intel Core i3 systems)
+* Python 3.10+ (tested on Python 3.14.8 64-bit)
+* 4 GB+ RAM (optimized for Intel Core i3 / 8 GB RAM systems; no GPU required)
 
 ### Step 1: Clone or Navigate to the Repository
 ```bash
@@ -109,39 +139,51 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Step 4: Run Dataset Inspection Script
+### Step 4: Run Data Preprocessing & Leakage Verification
 ```bash
-# Inspect 'core' configuration (classical ML partition)
-python ml/inspect_dataset.py --config core
-
-# Optional: Inspect 'full' configuration (expanded transformer partition)
-python ml/inspect_dataset.py --config full
+python ml/preprocess_data.py --config core
 ```
 
-### Step 5: Run Deep Exploratory Analysis & Visualization
+### Step 5: Train Baseline Model & Save Artifacts
 ```bash
-python ml/analyze_dataset.py --config core
+python ml/train.py --config core --max-features 20000 --random-state 42
 ```
-*Outputs will be saved in `ml/reports/`.*
+*Artifacts saved to `ml/artifacts/prompt_injection_logreg.joblib` and `ml/artifacts/model_metadata.json`.*
 
-### Step 6: Run Automated Unit Tests
+### Step 6: Evaluate Model on Held-Out Test Set
 ```bash
+python ml/evaluate.py --config core
+```
+*Visual charts and metrics saved to `ml/reports/`.*
+
+### Step 7: Run Qualitative Error Analysis
+```bash
+python ml/error_analysis.py --config core
+```
+*Report saved to `ml/reports/error_analysis.md`.*
+
+### Step 8: Run Automated Unit Tests
+```bash
+# Day 1 Data pipeline tests
 python -m unittest ml/test_data_pipeline.py
+
+# Day 2 Model unit and smoke tests
+python -m unittest ml/test_model.py
 ```
 
 ---
 
-## 6. Planned Development Stages
+## 7. Planned Development Stages
 
-* **Day 1 (Completed):** Dataset inspection, data quality audits, leakage detection, empirical profiling, and documentation.
-* **Day 2 (Next):** Text preprocessing, character and word n-gram feature extraction (TF-IDF), length-bias mitigation, and baseline classical ML model training (Logistic Regression, Linear SVM, Decision Trees).
-* **Day 3:** Hyperparameter tuning, threshold calibration for False Positive Rate minimization, and serialization of inference pipelines.
-* **Day 4:** Deterministic security policy engine and sensitive data regex/canary token detectors.
-* **Day 5:** FastAPI firewall gateway with sub-5ms inference latency.
-* **Day 6:** React security monitoring dashboard and threat event telemetry.
-* **Day 7:** End-to-end integration testing and red-teaming against adversarial prompt injections.
+* [x] **Day 1 (Completed):** Dataset inspection, data quality audits, leakage detection, empirical profiling, and documentation.
+* [x] **Day 2 (Completed):** Data preprocessing, TF-IDF feature extraction, length-bias mitigation, Logistic Regression baseline training, held-out test evaluation, validation threshold calibration, error analysis, and unit testing.
+* [ ] **Day 3 (Next):** Model comparison (Linear SVM, Random Forest, Naive Bayes), character n-gram modeling to resist obfuscation/evasion, and calibrated ensemble export.
+* [ ] **Day 4:** Deterministic security policy engine (read-only enforcement, capability sandboxing, canary token leaks).
+* [ ] **Day 5:** FastAPI high-throughput firewall gateway with inline sub-5ms inspection.
+* [ ] **Day 6:** React security monitoring dashboard and real-time threat telemetry.
+* [ ] **Day 7:** End-to-end integration red-teaming against adaptive jailbreaks.
 
 ---
 
-## 7. License
+## 8. License
 This project is licensed under the Apache License 2.0. Dataset sourced from `cyberec/Prompt-injection-dataset` under Apache 2.0.
