@@ -1,0 +1,312 @@
+{
+  "model_name": "prompt_injection_svm",
+  "dataset_identifier": "cyberec/Prompt-injection-dataset",
+  "dataset_config": "core",
+  "text_column": "text",
+  "label_column": "label",
+  "label_mapping": {
+    "0": "benign",
+    "1": "prompt_injection"
+  },
+  "split_strategy": "Official group-aware splits (core_train, core_validation, core_test) with zero cross-split text/group leakage.",
+  "random_seed": 42,
+  "vectorizer_config": {
+    "type": "TfidfVectorizer",
+    "max_features": 20000,
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 2,
+    "sublinear_tf": true,
+    "lowercase": true,
+    "stop_words": null,
+    "actual_vocabulary_size": 9908
+  },
+  "classifier_config": {
+    "type": "LinearSVC",
+    "C": 1.0,
+    "loss": "squared_hinge",
+    "class_weight": "balanced",
+    "max_iter": 10000,
+    "random_state": 42,
+    "dual": "auto",
+    "scoring_method": "decision_function (NOT predict_proba)",
+    "score_interpretation": "decision_function() returns the signed distance from the learned decision boundary. Positive scores indicate class 1 (malicious), negative scores indicate class 0 (benign). Magnitudes are NOT calibrated probabilities and should not be treated as percentages."
+  },
+  "training_stats": {
+    "training_samples": 4391,
+    "validation_samples": 941,
+    "test_samples": 942,
+    "training_duration_seconds": 0.9247,
+    "model_size_bytes": 154047,
+    "training_timestamp_utc": "2026-10-30T19:11:13.764812+00:00",
+    "convergence_warning": null
+  },
+  "validation_metrics": {
+    "default_threshold": 0.0,
+    "accuracy": 0.9596,
+    "precision": 0.9526,
+    "recall": 0.9775,
+    "f1_score": 0.9649,
+    "false_positive_rate": 0.0639,
+    "false_positives": 26,
+    "false_negatives": 12,
+    "decision_score_range": {
+      "min": -1.6688,
+      "max": 2.8167
+    }
+  },
+  "threshold_calibration": {
+    "default_threshold": 0.0,
+    "score_type": "decision_function (NOT calibrated probability)",
+    "best_f1_threshold": 0.0133,
+    "best_f1_score": 0.9649,
+    "low_fpr_threshold": 0.574,
+    "score_range": {
+      "min": -1.6688,
+      "max": 2.8167
+    },
+    "threshold_sweep_sample": [
+      {
+        "threshold": -1.0184,
+        "precision": 0.6326,
+        "recall": 0.9963,
+        "f1": 0.7738,
+        "fpr": 0.7592,
+        "fp": 309,
+        "fn": 2
+      },
+      {
+        "threshold": -0.996,
+        "precision": 0.6667,
+        "recall": 0.9963,
+        "f1": 0.7988,
+        "fpr": 0.6536,
+        "fp": 266,
+        "fn": 2
+      },
+      {
+        "threshold": -0.9735,
+        "precision": 0.771,
+        "recall": 0.9963,
+        "f1": 0.8693,
+        "fpr": 0.3882,
+        "fp": 158,
+        "fn": 2
+      },
+      {
+        "threshold": -0.525,
+        "precision": 0.911,
+        "recall": 0.9963,
+        "f1": 0.9517,
+        "fpr": 0.1278,
+        "fp": 52,
+        "fn": 2
+      },
+      {
+        "threshold": -0.5026,
+        "precision": 0.9124,
+        "recall": 0.9944,
+        "f1": 0.9516,
+        "fpr": 0.1253,
+        "fp": 51,
+        "fn": 3
+      },
+      {
+        "threshold": -0.4801,
+        "precision": 0.9124,
+        "recall": 0.9944,
+        "f1": 0.9516,
+        "fpr": 0.1253,
+        "fp": 51,
+        "fn": 3
+      },
+      {
+        "threshold": -0.2783,
+        "precision": 0.9246,
+        "recall": 0.9869,
+        "f1": 0.9547,
+        "fpr": 0.1057,
+        "fp": 43,
+        "fn": 7
+      },
+      {
+        "threshold": -0.2558,
+        "precision": 0.9293,
+        "recall": 0.985,
+        "f1": 0.9564,
+        "fpr": 0.0983,
+        "fp": 40,
+        "fn": 8
+      },
+      {
+        "threshold": -0.2334,
+        "precision": 0.9326,
+        "recall": 0.985,
+        "f1": 0.9581,
+        "fpr": 0.0934,
+        "fp": 38,
+        "fn": 8
+      },
+      {
+        "threshold": -0.211,
+        "precision": 0.9326,
+        "recall": 0.985,
+        "f1": 0.9581,
+        "fpr": 0.0934,
+        "fp": 38,
+        "fn": 8
+      },
+      {
+        "threshold": -0.0316,
+        "precision": 0.9475,
+        "recall": 0.9794,
+        "f1": 0.9632,
+        "fpr": 0.0713,
+        "fp": 29,
+        "fn": 11
+      },
+      {
+        "threshold": -0.0091,
+        "precision": 0.9508,
+        "recall": 0.9775,
+        "f1": 0.964,
+        "fpr": 0.0663,
+        "fp": 27,
+        "fn": 12
+      },
+      {
+        "threshold": 0.0133,
+        "precision": 0.9526,
+        "recall": 0.9775,
+        "f1": 0.9649,
+        "fpr": 0.0639,
+        "fp": 26,
+        "fn": 12
+      },
+      {
+        "threshold": 0.0357,
+        "precision": 0.9559,
+        "recall": 0.9738,
+        "f1": 0.9647,
+        "fpr": 0.059,
+        "fp": 24,
+        "fn": 14
+      },
+      {
+        "threshold": 0.2151,
+        "precision": 0.9625,
+        "recall": 0.9625,
+        "f1": 0.9625,
+        "fpr": 0.0491,
+        "fp": 20,
+        "fn": 20
+      },
+      {
+        "threshold": 0.2376,
+        "precision": 0.9643,
+        "recall": 0.9607,
+        "f1": 0.9625,
+        "fpr": 0.0467,
+        "fp": 19,
+        "fn": 21
+      },
+      {
+        "threshold": 0.26,
+        "precision": 0.9697,
+        "recall": 0.9588,
+        "f1": 0.9642,
+        "fpr": 0.0393,
+        "fp": 16,
+        "fn": 22
+      },
+      {
+        "threshold": 0.2824,
+        "precision": 0.9695,
+        "recall": 0.9532,
+        "f1": 0.9613,
+        "fpr": 0.0393,
+        "fp": 16,
+        "fn": 25
+      },
+      {
+        "threshold": 0.4618,
+        "precision": 0.9786,
+        "recall": 0.9401,
+        "f1": 0.9589,
+        "fpr": 0.027,
+        "fp": 11,
+        "fn": 32
+      },
+      {
+        "threshold": 0.4843,
+        "precision": 0.9804,
+        "recall": 0.9363,
+        "f1": 0.9579,
+        "fpr": 0.0246,
+        "fp": 10,
+        "fn": 34
+      },
+      {
+        "threshold": 0.5067,
+        "precision": 0.9822,
+        "recall": 0.9307,
+        "f1": 0.9558,
+        "fpr": 0.0221,
+        "fp": 9,
+        "fn": 37
+      },
+      {
+        "threshold": 0.5291,
+        "precision": 0.9821,
+        "recall": 0.9251,
+        "f1": 0.9527,
+        "fpr": 0.0221,
+        "fp": 9,
+        "fn": 40
+      },
+      {
+        "threshold": 0.9777,
+        "precision": 0.9971,
+        "recall": 0.6536,
+        "f1": 0.7896,
+        "fpr": 0.0025,
+        "fp": 1,
+        "fn": 185
+      },
+      {
+        "threshold": 1.0001,
+        "precision": 0.997,
+        "recall": 0.6273,
+        "f1": 0.7701,
+        "fpr": 0.0025,
+        "fp": 1,
+        "fn": 199
+      },
+      {
+        "threshold": 1.0225,
+        "precision": 0.9968,
+        "recall": 0.5918,
+        "f1": 0.7427,
+        "fpr": 0.0025,
+        "fp": 1,
+        "fn": 218
+      }
+    ]
+  },
+  "environment": {
+    "python_version": "3.14.8 (tags/v3.14.8:8e6e75d, Sep 30 2026, 18:19:33) [MSC v.1944 64 bit (AMD64)]",
+    "scikit_learn_version": "1.9.1",
+    "joblib_version": "1.6.0",
+    "numpy_version": "2.5.4",
+    "pandas_version": "3.0.6"
+  },
+  "security_limitations": [
+    "Statistical bag-of-words / n-gram models can miss novel zero-day prompt injection phrasings and out-of-vocabulary evasion suffixes.",
+    "Spurious text length correlations can affect classification of extremely long benign inputs.",
+    "Prompt injection classification is non-deterministic and must be paired with deterministic security policies and capability constraints.",
+    "Model is trained primarily on English prompt injections and does not provide multi-lingual or multi-turn crescendo attack guarantees.",
+    "LinearSVC decision scores are NOT calibrated probabilities. They represent geometric distance from the hyperplane."
+  ]
+}

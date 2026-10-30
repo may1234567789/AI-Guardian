@@ -30,6 +30,24 @@ LABEL_MAPPING = {
 }
 
 
+def validate_text_inputs(texts: Any) -> list[str]:
+    """Reject invalid pipeline inputs explicitly without coercing them to text."""
+    if isinstance(texts, (str, bytes)):
+        raise ValueError("Model input must be an iterable of text strings, not a single string.")
+    try:
+        text_list = list(texts)
+    except TypeError as error:
+        raise ValueError("Model input must be an iterable of text strings.") from error
+
+    for index, text in enumerate(text_list):
+        if not isinstance(text, str):
+            raise ValueError(
+                f"Model input at position {index} must be a string; "
+                f"received {type(text).__name__}."
+            )
+    return text_list
+
+
 def clean_text(text: Any) -> str:
     """
     Safely clean and normalize input prompt text without removing critical security tokens.

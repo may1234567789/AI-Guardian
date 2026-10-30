@@ -5,7 +5,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Day%202%20Completed-brightgreen.svg)](#current-implementation-status)
+[![Status](https://img.shields.io/badge/Status-Day%203%20Completed-brightgreen.svg)](#current-implementation-status)
 
 ---
 
@@ -46,7 +46,9 @@ SentinelAI/
 │   │   └── ...
 │   ├── artifacts/              # Serialized models and vectorizers
 │   │   ├── prompt_injection_logreg.joblib  # Trained TF-IDF + Logistic Regression pipeline
-│   │   └── model_metadata.json             # Hyperparameters, metrics, and limitations
+│   │   ├── prompt_injection_svm.joblib     # Trained TF-IDF + LinearSVC pipeline
+│   │   ├── model_metadata.json             # Day 2 baseline metadata
+│   │   └── svm_model_metadata.json         # Day 3 SVM metadata and validation results
 │   ├── reports/                # Visual charts, markdown analyses, and JSON summaries
 │   │   ├── confusion_matrix.png            # Day 2: Test set confusion matrix heatmap
 │   │   ├── roc_curve.png                   # Day 2: Receiver operating characteristic curve
@@ -55,8 +57,15 @@ SentinelAI/
 │   │   ├── test_evaluation_summary.json    # Day 2: Complete machine-readable test metrics
 │   │   ├── class_distribution.png          # Day 1: Class distribution breakdown
 │   │   ├── text_length_distribution.png    # Day 1: Text length density plots
+│   │   ├── day3_model_comparison.json      # Day 3: Test metrics and threshold results
+│   │   ├── model_error_comparison.md       # Day 3: Disagreement and error analysis
+│   │   ├── robustness_test_results.md      # Day 3: Synthetic robustness results
 │   │   └── ...
 │   ├── notebooks/              # Exploratory research notebooks
+│   ├── train_svm.py            # Day 3 TF-IDF + LinearSVC training
+│   ├── compare_models.py       # Saved-artifact comparison and visualizations
+│   ├── compare_errors.py       # Cross-model disagreement analysis
+│   ├── robustness_tests.py     # Small, labeled synthetic test suite
 │   ├── preprocess_data.py      # Leakage-safe preprocessing & cross-split isolation
 │   ├── train.py                # Pipeline construction, training, threshold tuning & serialization
 │   ├── evaluate.py             # Held-out test set evaluation & chart generation
@@ -70,7 +79,8 @@ SentinelAI/
 ├── docs/                       # Research documentation and empirical reports
 │   ├── day1_dataset_report.md  # Day 1 empirical dataset quality audit
 │   ├── day1_research_notes.md  # Day 1 theoretical foundations and threat taxonomy
-│   └── day2_model_report.md    # Day 2 complete baseline model training and evaluation report
+│   ├── day2_model_report.md    # Day 2 complete baseline model training and evaluation report
+│   └── day3_model_comparison.md # Day 3 controlled comparison and limitations
 ├── requirements.txt            # Pinned, tested dependencies for local environment
 ├── .gitignore                  # Git exclusion rules
 └── README.md                   # Project overview and instructions
@@ -78,7 +88,7 @@ SentinelAI/
 
 ---
 
-## 4. Current Implementation Status (Day 1 & Day 2 Complete)
+## 4. Current Implementation Status (Day 1–Day 3 Complete)
 
 * [x] **Day 1 - Dataset Understanding & Audits:** Schema discovery, data quality inspection (zero nulls, zero empty strings), cross-split leakage audit, length disparity discovery, local Parquet/CSV storage, and 5 visual reports.
 * [x] **Day 2 - Preprocessing Pipeline:** Leakage-safe, security-preserving preprocessing in `ml/preprocess_data.py`. Verified zero cross-split overlap across train, validation, and test partitions.
@@ -90,6 +100,10 @@ SentinelAI/
 * [x] **Day 2 - Visual Reporting:** Publication-ready charts generated in `ml/reports/`: `confusion_matrix.png`, `roc_curve.png`, and `metrics_summary.png`.
 * [x] **Day 2 - Error Analysis:** In-depth qualitative audit in `ml/reports/error_analysis.md` analyzing false alarms on long benign prompts and bypasses on social-engineering roleplay ("grandma exploit").
 * [x] **Day 2 - Automated Unit Testing:** 7 automated test suites passing in `ml/test_model.py` (model loading, step integrity, predict_proba calibration, batch/single inference, empty input edge cases, and smoke tests).
+* [x] **Day 3 - Linear SVM:** Trained and saved the TF-IDF + LinearSVC pipeline to `ml/artifacts/prompt_injection_svm.joblib`; validation-only threshold analysis and model metadata are saved alongside it.
+* [x] **Day 3 - Controlled Comparison:** Evaluated the saved Logistic Regression and LinearSVC pipelines on the same 942-example `core_test` split; results and charts are in `ml/reports/`.
+* [x] **Day 3 - Errors and Robustness:** Generated cross-model error analysis and executed a separate 30-case synthetic suite; see the report and caveats below.
+* [x] **Day 3 - Tests and Research Report:** SVM and Logistic Regression artifact tests pass; see `docs/day3_model_comparison.md`.
 
 ---
 
@@ -111,7 +125,50 @@ Evaluated strictly on the held-out test split (`core_test.parquet`, $N = 942$: 3
 
 ---
 
-## 6. Setup & Execution Instructions
+## 6. Day 3 Model Comparison
+
+The saved Day 2 Logistic Regression artifact and the Day 3 LinearSVC artifact were compared on the identical official `core_test` split (942 examples: 390 benign, 552 malicious). Both artifact metadata records 4,391 training rows from `core_train`; exact text and `group_id` overlap across official splits was checked and found to be zero. No baseline model or Day 2 evaluation report was overwritten.
+
+### Default test-set metrics
+
+| Metric | Logistic Regression | Linear SVM |
+| :--- | ---: | ---: |
+| Accuracy | 95.22% | 95.22% |
+| Precision | 94.55% | 94.71% |
+| Recall | 97.46% | 97.28% |
+| F1 | 0.9599 | 0.9598 |
+| False-positive rate | 7.95% (31/390) | 7.69% (30/390) |
+| False-negative rate | 2.54% (14/552) | 2.72% (15/552) |
+| ROC-AUC | 0.9937 | 0.9943 |
+| Training duration (recorded) | 0.1359 s | 0.9247 s |
+| Mean single-request latency (this comparison run) | 3.739 ms | 3.886 ms |
+| P95 single-request latency (this comparison run) | 6.179 ms | 7.173 ms |
+| Saved artifact size | 162.3 KiB | 150.4 KiB |
+
+Validation-selected thresholds maximized F1 on `core_validation` only: Logistic Regression threshold **0.7102** and SVM decision-score threshold **0.0300**. On the untouched test set these yielded, respectively, LR F1 **0.9532** (7 FP, 43 FN) and SVM F1 **0.9606** (29 FP, 15 FN). SVM decision scores are not probabilities. Latency is hardware/load-sensitive; use the same-run values above for comparison rather than the earlier Day 2 profiling result.
+
+| Model at validation-selected threshold | Test accuracy | Precision | Recall | F1 | FP / FN |
+| :--- | ---: | ---: | ---: | ---: | ---: |
+| Logistic Regression (0.7102 probability) | 94.69% | 98.64% | 92.21% | 0.9532 | 7 / 43 |
+| Linear SVM (0.0300 decision score) | 95.33% | 94.88% | 97.28% | 0.9606 | 29 / 15 |
+
+The models tie on accuracy and near-tie on F1. SVM reduces one default-threshold false positive but adds one false negative; measured ROC-AUC is slightly higher, while the Logistic Regression artifact trains faster. There is no evidence here of a decisive winner. Full methods, charts, errors, synthetic test findings, and limitations are in [docs/day3_model_comparison.md](docs/day3_model_comparison.md).
+
+### Day 3 commands
+
+```powershell
+python ml\train_svm.py --config core --max-features 20000 --ngram-min 1 --ngram-max 2 --c-reg 1.0 --class-weight balanced --random-state 42
+python ml\compare_models.py --config core
+python ml\compare_errors.py --config core
+python ml\robustness_tests.py
+python -m unittest ml/test_svm.py ml/test_model.py
+```
+
+Default comparison outputs are saved in `ml/reports/`. The `LinearSVC.decision_function()` score is a signed distance from the learned boundary, not an attack-probability percentage.
+
+---
+
+## 7. Setup & Execution Instructions
 
 ### Prerequisites
 * Windows 10/11, Linux, or macOS
@@ -169,21 +226,22 @@ python -m unittest ml/test_data_pipeline.py
 
 # Day 2 Model unit and smoke tests
 python -m unittest ml/test_model.py
+
+# Day 3 SVM and baseline regression tests
+python -m unittest ml/test_svm.py ml/test_model.py
 ```
 
 ---
 
-## 7. Planned Development Stages
+## 8. Planned Development Stages
 
 * [x] **Day 1 (Completed):** Dataset inspection, data quality audits, leakage detection, empirical profiling, and documentation.
 * [x] **Day 2 (Completed):** Data preprocessing, TF-IDF feature extraction, length-bias mitigation, Logistic Regression baseline training, held-out test evaluation, validation threshold calibration, error analysis, and unit testing.
-* [ ] **Day 3 (Next):** Model comparison (Linear SVM, Random Forest, Naive Bayes), character n-gram modeling to resist obfuscation/evasion, and calibrated ensemble export.
-* [ ] **Day 4:** Deterministic security policy engine (read-only enforcement, capability sandboxing, canary token leaks).
-* [ ] **Day 5:** FastAPI high-throughput firewall gateway with inline sub-5ms inspection.
-* [ ] **Day 6:** React security monitoring dashboard and real-time threat telemetry.
-* [ ] **Day 7:** End-to-end integration red-teaming against adaptive jailbreaks.
+* [x] **Day 3 (Completed):** TF-IDF + LinearSVC training, saved-artifact comparison, validation-only threshold analysis, error analysis, synthetic robustness tests, and documentation.
+* [ ] **Day 4 (Next):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
+* [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, monitoring dashboard, and adaptive red-teaming.
 
 ---
 
-## 8. License
+## 9. License
 This project is licensed under the Apache License 2.0. Dataset sourced from `cyberec/Prompt-injection-dataset` under Apache 2.0.

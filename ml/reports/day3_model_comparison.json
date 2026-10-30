@@ -1,0 +1,180 @@
+{
+  "comparison_timestamp": "2026-10-30T19:12:23Z",
+  "dataset_config": "core",
+  "training_samples": 4391,
+  "validation_samples": 941,
+  "test_samples": 942,
+  "training_class_distribution": {
+    "benign_0": 1741,
+    "malicious_1": 2650
+  },
+  "class_distribution": {
+    "benign_0": 390,
+    "malicious_1": 552
+  },
+  "logistic_regression": {
+    "artifact_path": "ml/artifacts/prompt_injection_logreg.joblib",
+    "metrics": {
+      "accuracy": 0.9522,
+      "precision": 0.9455,
+      "recall": 0.9746,
+      "f1_score": 0.9599,
+      "false_positive_rate": 0.0795,
+      "false_negative_rate": 0.0254,
+      "confusion_matrix": {
+        "tn": 359,
+        "fp": 31,
+        "fn": 14,
+        "tp": 538
+      },
+      "score_type": "probability",
+      "roc_auc": 0.9937,
+      "latency": {
+        "full_batch_latency_seconds": 0.12,
+        "batch_latency_per_sample_ms": 0.1274,
+        "single_request_latency_mean_ms": 3.7386,
+        "single_request_latency_p95_ms": 6.1789,
+        "single_request_latency_p99_ms": 7.086
+      },
+      "model_size_bytes": 166187,
+      "training_duration_seconds": 0.1359
+    },
+    "score_type": "probability",
+    "vectorizer_configuration": {
+      "type": "TfidfVectorizer",
+      "max_features": 20000,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "min_df": 2,
+      "sublinear_tf": true,
+      "lowercase": true,
+      "stop_words": null,
+      "actual_vocabulary_size": 9908
+    },
+    "classifier_configuration": {
+      "type": "LogisticRegression",
+      "C": 1.0,
+      "penalty": "l2 (default)",
+      "solver": "lbfgs",
+      "class_weight": "balanced",
+      "max_iter": 1000,
+      "random_state": 42
+    }
+  },
+  "linear_svm": {
+    "artifact_path": "ml/artifacts/prompt_injection_svm.joblib",
+    "metrics": {
+      "accuracy": 0.9522,
+      "precision": 0.9471,
+      "recall": 0.9728,
+      "f1_score": 0.9598,
+      "false_positive_rate": 0.0769,
+      "false_negative_rate": 0.0272,
+      "confusion_matrix": {
+        "tn": 360,
+        "fp": 30,
+        "fn": 15,
+        "tp": 537
+      },
+      "score_type": "decision_function",
+      "roc_auc": 0.9943,
+      "latency": {
+        "full_batch_latency_seconds": 0.1156,
+        "batch_latency_per_sample_ms": 0.1227,
+        "single_request_latency_mean_ms": 3.8858,
+        "single_request_latency_p95_ms": 7.173,
+        "single_request_latency_p99_ms": 7.4248
+      },
+      "model_size_bytes": 154047,
+      "training_duration_seconds": 0.9247
+    },
+    "score_type": "decision_function",
+    "vectorizer_configuration": {
+      "type": "TfidfVectorizer",
+      "max_features": 20000,
+      "ngram_range": [
+        1,
+        2
+      ],
+      "min_df": 2,
+      "sublinear_tf": true,
+      "lowercase": true,
+      "stop_words": null,
+      "actual_vocabulary_size": 9908
+    },
+    "classifier_configuration": {
+      "type": "LinearSVC",
+      "C": 1.0,
+      "loss": "squared_hinge",
+      "class_weight": "balanced",
+      "max_iter": 10000,
+      "random_state": 42,
+      "dual": "auto",
+      "scoring_method": "decision_function (NOT predict_proba)",
+      "score_interpretation": "decision_function() returns the signed distance from the learned decision boundary. Positive scores indicate class 1 (malicious), negative scores indicate class 0 (benign). Magnitudes are NOT calibrated probabilities and should not be treated as percentages."
+    },
+    "decision_score_note": "LinearSVC decision scores are signed distances from the decision boundary, NOT calibrated probabilities. Positive = class 1 (malicious), negative = class 0 (benign). Magnitudes reflect geometric distance, not attack probability."
+  },
+  "validation_selected_thresholds": {
+    "selection_objective": "Maximize validation F1; ties prefer the threshold closest to the model default.",
+    "selection_split": "core_validation",
+    "test_split": "core_test",
+    "logistic_regression": {
+      "threshold": 0.7102070865630954,
+      "validation_f1": 0.9574468085106383,
+      "test_metrics": {
+        "accuracy": 0.9469,
+        "precision": 0.9864,
+        "recall": 0.9221,
+        "f1_score": 0.9532,
+        "false_positive_rate": 0.0179,
+        "false_negative_rate": 0.0779,
+        "confusion_matrix": {
+          "tn": 383,
+          "fp": 7,
+          "fn": 43,
+          "tp": 509
+        },
+        "score_type": "probability",
+        "roc_auc": 0.9937
+      }
+    },
+    "linear_svm": {
+      "threshold": 0.02995867467446145,
+      "validation_f1": 0.9666666666666667,
+      "test_metrics": {
+        "accuracy": 0.9533,
+        "precision": 0.9488,
+        "recall": 0.9728,
+        "f1_score": 0.9606,
+        "false_positive_rate": 0.0744,
+        "false_negative_rate": 0.0272,
+        "confusion_matrix": {
+          "tn": 361,
+          "fp": 29,
+          "fn": 15,
+          "tp": 537
+        },
+        "score_type": "decision_function",
+        "roc_auc": 0.9943
+      }
+    }
+  },
+  "comparison_notes": [
+    "Both models were evaluated on the identical held-out test set (core_test).",
+    "Both models were loaded from saved artifacts, not retrained.",
+    "Both models were trained on the same training data (core_train, 4391 samples).",
+    "Artifact metadata records the same dataset/configuration and training count; the artifacts do not contain a row-level training-data fingerprint.",
+    "ROC-AUC for SVM uses decision_function scores, which is mathematically valid.",
+    "Latency measured with identical procedures (5-run batch, 100-sample single)."
+  ],
+  "visualization_paths": {
+    "confusion_matrices": "ml\\reports\\day3_confusion_matrices.png",
+    "metric_comparison": "ml\\reports\\day3_metric_comparison.png",
+    "roc_curves": "ml\\reports\\day3_roc_curves.png",
+    "precision_recall": "ml\\reports\\day3_precision_recall_curves.png",
+    "threshold_analysis": "ml\\reports\\day3_threshold_analysis.png"
+  }
+}
