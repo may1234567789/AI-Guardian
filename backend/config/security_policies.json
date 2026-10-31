@@ -1,0 +1,55 @@
+{
+  "roles": {
+    "admin": {
+      "allowed_actions": [
+        "search_public_documents",
+        "read_customer_record",
+        "send_simulated_email",
+        "update_simulated_record",
+        "delete_simulated_resource"
+      ],
+      "notes": [
+        "Deletion requires explicit confirmation and additional checks."
+      ]
+    },
+    "analyst": {
+      "allowed_actions": [
+        "search_public_documents",
+        "read_customer_record"
+      ],
+      "notes": [
+        "Analysts cannot send emails, update records, or delete resources."
+      ]
+    },
+    "viewer": {
+      "allowed_actions": [
+        "search_public_documents"
+      ],
+      "notes": [
+        "Viewers cannot read restricted customer records or modify resources."
+      ]
+    }
+  },
+  "actions": {
+    "search_public_documents": {
+      "description": "Search public instructions, FAQs, or company documentation.",
+      "requires_confirmation": false
+    },
+    "read_customer_record": {
+      "description": "Read a customer record or authorized profile.",
+      "requires_confirmation": false
+    },
+    "send_simulated_email": {
+      "description": "Send a simulated email to a user or internal mailbox.",
+      "requires_confirmation": false
+    },
+    "update_simulated_record": {
+      "description": "Write a change into a simulated record store.",
+      "requires_confirmation": false
+    },
+    "delete_simulated_resource": {
+      "description": "Delete a simulated resource after explicit confirmation.",
+      "requires_confirmation": true
+    }
+  }
+}
