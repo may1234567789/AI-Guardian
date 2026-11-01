@@ -3,9 +3,9 @@
 > **Machine Learning-Powered Security Firewall for AI Agents and LLMs**  
 > *Combines statistical machine learning classifiers, sensitive data detection, and deterministic policy enforcement to mitigate prompt injection and unauthorized autonomous actions.*
 
-[![Python](https://img.shields.io/badge/Python-3.14-blue.svg)](https://www.python.org/)
+[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Day%203%20Completed-brightgreen.svg)](#current-implementation-status)
+[![Status](https://img.shields.io/badge/Status-Day%205%20FastAPI%20Backend%20Complete-brightgreen.svg)](#current-implementation-status)
 
 ---
 
@@ -88,7 +88,7 @@ SentinelAI/
 
 ---
 
-## 4. Current Implementation Status (Day 1–Day 3 Complete)
+## 4. Current Implementation Status (Day 1–Day 5 Complete)
 
 * [x] **Day 1 - Dataset Understanding & Audits:** Schema discovery, data quality inspection (zero nulls, zero empty strings), cross-split leakage audit, length disparity discovery, local Parquet/CSV storage, and 5 visual reports.
 * [x] **Day 2 - Preprocessing Pipeline:** Leakage-safe, security-preserving preprocessing in `ml/preprocess_data.py`. Verified zero cross-split overlap across train, validation, and test partitions.
@@ -104,6 +104,8 @@ SentinelAI/
 * [x] **Day 3 - Controlled Comparison:** Evaluated the saved Logistic Regression and LinearSVC pipelines on the same 942-example `core_test` split; results and charts are in `ml/reports/`.
 * [x] **Day 3 - Errors and Robustness:** Generated cross-model error analysis and executed a separate 30-case synthetic suite; see the report and caveats below.
 * [x] **Day 3 - Tests and Research Report:** SVM and Logistic Regression artifact tests pass; see `docs/day3_model_comparison.md`.
+* [x] **Day 4 - Deterministic Policy Engine:** Added role-based permissions, action requirements, and security policy evaluation in `backend/security/`.
+* [x] **Day 5 - FastAPI Backend & Audit Logging:** Built the backend API, request models, SQLite event logging, integration with the existing security engine, and route validation for scan/gating/action flows.
 
 ---
 
@@ -172,7 +174,7 @@ Default comparison outputs are saved in `ml/reports/`. The `LinearSVC.decision_f
 
 ### Prerequisites
 * Windows 10/11, Linux, or macOS
-* Python 3.10+ (tested on Python 3.14.8 64-bit)
+* Python 3.12.x (verified working in the local environment; Python 3.14 had dependency build issues with the FastAPI/Pydantic stack)
 * 4 GB+ RAM (optimized for Intel Core i3 / 8 GB RAM systems; no GPU required)
 
 ### Step 1: Clone or Navigate to the Repository
@@ -219,29 +221,52 @@ python ml/error_analysis.py --config core
 ```
 *Report saved to `ml/reports/error_analysis.md`.*
 
-### Step 8: Run Automated Unit Tests
+### Step 8: Start the FastAPI Backend
+```powershell
+# from the repo root
+$env:PYTHONPATH = "."
+.\venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+Visit:
+- `http://127.0.0.1:8000/`
+- `http://127.0.0.1:8000/docs`
+- `http://127.0.0.1:8000/openapi.json`
+
+### Step 9: Run Backend Validation Tests
 ```bash
-# Day 1 Data pipeline tests
-python -m unittest ml/test_data_pipeline.py
-
-# Day 2 Model unit and smoke tests
-python -m unittest ml/test_model.py
-
-# Day 3 SVM and baseline regression tests
-python -m unittest ml/test_svm.py ml/test_model.py
+$env:PYTHONPATH = "."
+.\venv\Scripts\python.exe -m pytest backend/tests -q
 ```
 
 ---
 
-## 8. Planned Development Stages
+## 8. Day 5 Acceptance Checklist
+
+* [x] Backend package structure created under `backend/`.
+* [x] Existing Day 4 security modules reused rather than duplicated.
+* [x] FastAPI app boots with database and model initialization.
+* [x] `/scan`, `/scan-output`, `/scan-document` endpoints return structured decisions and risk scores.
+* [x] `/check-action` end-to-end evaluation includes policy + ML + leak gating.
+* [x] `/events` and `/events/{request_id}` expose persisted audit events.
+* [x] `/stats` returns aggregate counts by decision.
+* [x] `/health` confirms DB and model status.
+* [x] SQLite event persistence created and verified with TestClient.
+* [x] Targeted backend test suite passes (`30 passed`).
+* [x] Live API docs and OpenAPI JSON are available from the running app.
+
+---
+
+## 9. Planned Development Stages
 
 * [x] **Day 1 (Completed):** Dataset inspection, data quality audits, leakage detection, empirical profiling, and documentation.
 * [x] **Day 2 (Completed):** Data preprocessing, TF-IDF feature extraction, length-bias mitigation, Logistic Regression baseline training, held-out test evaluation, validation threshold calibration, error analysis, and unit testing.
 * [x] **Day 3 (Completed):** TF-IDF + LinearSVC training, saved-artifact comparison, validation-only threshold analysis, error analysis, synthetic robustness tests, and documentation.
-* [ ] **Day 4 (Next):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
+* [x] **Day 4 (Completed):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
+* [x] **Day 5 (Completed):** FastAPI backend, audit log persistence, API validation, and live docs startup checks.
 * [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, monitoring dashboard, and adaptive red-teaming.
 
 ---
 
-## 9. License
+## 10. License
 This project is licensed under the Apache License 2.0. Dataset sourced from `cyberec/Prompt-injection-dataset` under Apache 2.0.
