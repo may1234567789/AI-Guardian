@@ -33,3 +33,15 @@ def test_no_raw_secrets_in_responses():
     response = client.post('/scan', json={'prompt': 'Use api key sk_live_ABCDEF1234567890 to access the system.', 'user_context': 'mock-user'})
     body = response.json()
     assert 'sk_live_ABCDEF1234567890' not in str(body)
+
+
+def test_frontend_loopback_origin_is_allowed_by_cors():
+    response = client.options(
+        '/health',
+        headers={
+            'Origin': 'http://127.0.0.1:5173',
+            'Access-Control-Request-Method': 'GET',
+        },
+    )
+    assert response.status_code == 200
+    assert response.headers['access-control-allow-origin'] == 'http://127.0.0.1:5173'

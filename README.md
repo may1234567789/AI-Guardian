@@ -5,7 +5,7 @@
 
 [![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Day%205%20FastAPI%20Backend%20Complete-brightgreen.svg)](#current-implementation-status)
+[![Status](https://img.shields.io/badge/Status-Day%206%20Security%20Dashboard%20Complete-brightgreen.svg)](#current-implementation-status)
 
 ---
 
@@ -74,13 +74,14 @@ SentinelAI/
 │   ├── inspect_dataset.py      # Schema discovery, null/duplicate checks, leakage audits
 │   ├── analyze_dataset.py      # In-depth EDA, statistical profiling, and visualizations
 │   └── test_data_pipeline.py   # Automated unit tests for inspection & analysis logic
-├── backend/                    # Reserved for FastAPI Gateway (Planned)
-├── frontend/                   # Reserved for React Firewall Dashboard (Planned)
+├── backend/                    # FastAPI security API and SQLite audit log
+├── frontend/                   # React/Vite security dashboard
 ├── docs/                       # Research documentation and empirical reports
 │   ├── day1_dataset_report.md  # Day 1 empirical dataset quality audit
 │   ├── day1_research_notes.md  # Day 1 theoretical foundations and threat taxonomy
 │   ├── day2_model_report.md    # Day 2 complete baseline model training and evaluation report
-│   └── day3_model_comparison.md # Day 3 controlled comparison and limitations
+│   ├── day3_model_comparison.md # Day 3 controlled comparison and limitations
+│   └── day6_frontend_dashboard.md # Day 6 dashboard implementation
 ├── requirements.txt            # Pinned, tested dependencies for local environment
 ├── .gitignore                  # Git exclusion rules
 └── README.md                   # Project overview and instructions
@@ -88,7 +89,7 @@ SentinelAI/
 
 ---
 
-## 4. Current Implementation Status (Day 1–Day 5 Complete)
+## 4. Current Implementation Status (Day 1–Day 6 Complete)
 
 * [x] **Day 1 - Dataset Understanding & Audits:** Schema discovery, data quality inspection (zero nulls, zero empty strings), cross-split leakage audit, length disparity discovery, local Parquet/CSV storage, and 5 visual reports.
 * [x] **Day 2 - Preprocessing Pipeline:** Leakage-safe, security-preserving preprocessing in `ml/preprocess_data.py`. Verified zero cross-split overlap across train, validation, and test partitions.
@@ -106,6 +107,7 @@ SentinelAI/
 * [x] **Day 3 - Tests and Research Report:** SVM and Logistic Regression artifact tests pass; see `docs/day3_model_comparison.md`.
 * [x] **Day 4 - Deterministic Policy Engine:** Added role-based permissions, action requirements, and security policy evaluation in `backend/security/`.
 * [x] **Day 5 - FastAPI Backend & Audit Logging:** Built the backend API, request models, SQLite event logging, integration with the existing security engine, and route validation for scan/gating/action flows.
+* [x] **Day 6 - Security Dashboard:** Built a responsive React/Vite dashboard with overview statistics, prompt and output scans, backend action-policy checks, event browsing, historical model results, and API settings.
 
 ---
 
@@ -239,6 +241,20 @@ $env:PYTHONPATH = "."
 .\venv\Scripts\python.exe -m pytest backend/tests -q
 ```
 
+### Step 10: Start the SentinelAI Dashboard
+
+In another terminal:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+Open the dashboard at `http://127.0.0.1:5173`. The dashboard uses the local API at `http://127.0.0.1:8000` by default. Keep the backend running in its own terminal. You may set `VITE_API_BASE_URL` in `frontend/.env.local` before starting Vite to use a different backend URL; the Settings page can also update the URL for the current browser.
+
+The dashboard provides API-backed overview and event data, prompt scanning, data-leak scanning, action authorization evaluation, historical model comparisons, and connection settings. The role selector is a mock development identity; it is not production authentication.
+
 ---
 
 ## 8. Day 5 Acceptance Checklist
@@ -264,7 +280,8 @@ $env:PYTHONPATH = "."
 * [x] **Day 3 (Completed):** TF-IDF + LinearSVC training, saved-artifact comparison, validation-only threshold analysis, error analysis, synthetic robustness tests, and documentation.
 * [x] **Day 4 (Completed):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
 * [x] **Day 5 (Completed):** FastAPI backend, audit log persistence, API validation, and live docs startup checks.
-* [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, monitoring dashboard, and adaptive red-teaming.
+* [x] **Day 6 (Completed):** Responsive React dashboard, API integration, event monitoring, model-performance reporting, and frontend setup documentation.
+* [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, and adaptive red-teaming.
 
 ---
 
