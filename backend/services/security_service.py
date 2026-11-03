@@ -60,9 +60,15 @@ class SecurityService:
             "public faq",
             "public knowledge base",
             "onboarding steps",
+            "onboarding guide",
+            "public onboarding",
             "public documentation",
+            "public manual",
             "faq",
             "knowledge base",
+            "documentation",
+            "release notes",
+            "setup instructions",
         )
         if any(term in lowered for term in public_terms):
             return True
