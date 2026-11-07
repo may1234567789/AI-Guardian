@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from backend.api.actions import router as actions_router
 from backend.api.events import router as events_router
+from backend.api.evaluation import router as evaluation_router
 from backend.api.scan import router as scan_router
 from backend.api.stats import router as stats_router
 from backend.database.database import create_db_and_tables
@@ -96,6 +97,7 @@ async def handle_unexpected_exception(request: Request, exc: Exception):
 app.include_router(scan_router)
 app.include_router(actions_router)
 app.include_router(events_router)
+app.include_router(evaluation_router)
 app.include_router(stats_router)
 
 

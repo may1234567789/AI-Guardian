@@ -54,6 +54,7 @@ function post(path, body) {
 
 export const healthCheck = () => request("/health");
 export const getStats = () => request("/stats");
+export const getEvaluationSummary = () => request("/evaluation/summary");
 export const scanPrompt = (payload) => post("/scan", payload);
 export const scanOutput = (payload) => post("/scan-output", payload);
 export const checkAction = (payload) => post("/check-action", payload);

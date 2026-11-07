@@ -74,13 +74,19 @@ class PermissionGuard:
 
         try:
             ml_result = self.prompt_detector.detect(prompt)
-        except Exception:
-            ml_result = {
-                "is_suspicious": False,
-                "predicted_label": "unknown",
-                "risk_score": 0.0,
-                "model_name": "unavailable",
-                "detection_reason": "ML model unavailable; policy remains the primary gate.",
+        except (RuntimeError, OSError, ValueError, TypeError) as exc:
+            return {
+                "authorized": False,
+                "reason": f"Prompt detector unavailable; request blocked closed ({type(exc).__name__}).",
+                "policy_decision": policy_result,
+                "ml_detection": {
+                    "is_suspicious": None,
+                    "predicted_label": "unavailable",
+                    "risk_score": 1.0,
+                    "model_name": "unavailable",
+                    "detection_reason": "The prompt detector failed; protected actions require a working detector.",
+                },
+                "decision": "BLOCK",
             }
 
         if self._contains_explicit_injection_markers(prompt):

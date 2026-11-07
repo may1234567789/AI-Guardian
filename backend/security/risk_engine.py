@@ -37,16 +37,20 @@ class RiskEngine:
         ml_result = self._safe_ml_result(prompt)
         leak_result = self.leak_detector.detect(prompt)
 
-        ml_risk = float(ml_result.get("risk_score", 0.0))
+        ml_risk = float(ml_result.get("risk_score") or 0.0)
         leak_risk = float(leak_result.get("risk_score", 0.0))
 
         allowed_by_policy = bool(policy_result.get("authorized", False))
+        model_unavailable = ml_result.get("predicted_label") == "unavailable"
         suspicious_prompt = bool(ml_result.get("is_suspicious", False))
         has_sensitive_data = bool(leak_result.get("has_sensitive_data", False))
 
         if not allowed_by_policy:
             final_authorized = False
             final_reason = policy_result.get("reason", "Denied by deterministic policy.")
+        elif model_unavailable:
+            final_authorized = False
+            final_reason = "Prompt detector is unavailable; the protected action was blocked closed."
         elif suspicious_prompt and not allow_ml_override and action in {"update_simulated_record", "send_simulated_email", "delete_simulated_resource"}:
             final_authorized = False
             final_reason = "Prompt injection detection is suspicious for a sensitive action, so the action was blocked."
@@ -71,13 +75,13 @@ class RiskEngine:
     def _safe_ml_result(self, prompt: str) -> Dict[str, Any]:
         try:
             return self.prompt_detector.detect(prompt)
-        except Exception:
+        except (RuntimeError, OSError, ValueError, TypeError) as exc:
             return {
-                "is_suspicious": False,
-                "predicted_label": "unknown",
-                "risk_score": 0.0,
+                "is_suspicious": None,
+                "predicted_label": "unavailable",
+                "risk_score": 1.0,
                 "model_name": "unavailable",
-                "detection_reason": "Prompt injection model was unavailable; action evaluation fell back to deterministic policy-only controls.",
+                "detection_reason": f"Prompt injection model failed ({type(exc).__name__}); protected actions fail closed.",
             }
 
     def authorize(self, prompt: str, role: str, action: str, *, confirm_delete: bool = False) -> Dict[str, Any]:

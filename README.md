@@ -238,8 +238,9 @@ Visit:
 ### Step 9: Run Backend Validation Tests
 ```bash
 $env:PYTHONPATH = "."
-.\venv\Scripts\python.exe -m pytest backend/tests -q
+.\venv\Scripts\python.exe -m pytest backend -q
 ```
+This includes the Day 8 evaluation invariant and summary-endpoint tests.
 
 ### Step 10: Start the SentinelAI Dashboard
 
@@ -281,6 +282,7 @@ The dashboard provides API-backed overview and event data, prompt scanning, data
 * [x] **Day 4 (Completed):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
 * [x] **Day 5 (Completed):** FastAPI backend, audit log persistence, API validation, and live docs startup checks.
 * [x] **Day 6 (Completed):** Responsive React dashboard, API integration, event monitoring, model-performance reporting, and frontend setup documentation.
+* [x] **Day 8 (Completed):** Synthetic E1-E4 evaluation, security invariant tests, raw results, failure analysis, charts, evaluation report, and results-backed dashboard. See [backend/evaluation/README.md](backend/evaluation/README.md).
 * [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, and adaptive red-teaming.
 
 ---

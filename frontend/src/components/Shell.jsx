@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Activity, ArrowUpRight, BarChart3, Bot, ChevronRight, FileSearch, LayoutDashboard, LockKeyhole, Menu, Settings, Shield, X } from "lucide-react";
+import { Activity, ArrowUpRight, BarChart3, Bot, ChevronRight, FileSearch, FlaskConical, LayoutDashboard, LockKeyhole, Menu, Settings, Shield, X } from "lucide-react";
 import { ConnectionBadge } from "./StatusBadges.jsx";
 import { getApiBaseUrl } from "../services/api.js";
 
@@ -11,6 +11,7 @@ const navigation = [
   { to: "/data-leak", label: "Data leak scanner", icon: Shield },
   { to: "/events", label: "Security events", icon: Activity },
   { to: "/models", label: "Model performance", icon: BarChart3 },
+  { to: "/evaluation", label: "Security evaluation", icon: FlaskConical },
   { to: "/settings", label: "Settings", icon: Settings },
 ];
 

@@ -10,6 +10,7 @@ const ActionAuthorization = lazy(() => import("./pages/ActionAuthorization.jsx")
 const DataLeakScanner = lazy(() => import("./pages/DataLeakScanner.jsx"));
 const SecurityEvents = lazy(() => import("./pages/SecurityEvents.jsx"));
 const ModelPerformance = lazy(() => import("./pages/ModelPerformance.jsx"));
+const EvaluationDashboard = lazy(() => import("./pages/EvaluationDashboard.jsx"));
 const Settings = lazy(() => import("./pages/Settings.jsx"));
 
 export default function App() {
@@ -42,6 +43,7 @@ export default function App() {
         <Route path="/data-leak" element={<Suspense fallback={<LoadingState />}><DataLeakScanner /></Suspense>} />
         <Route path="/events" element={<Suspense fallback={<LoadingState />}><SecurityEvents /></Suspense>} />
         <Route path="/models" element={<Suspense fallback={<LoadingState />}><ModelPerformance /></Suspense>} />
+        <Route path="/evaluation" element={<Suspense fallback={<LoadingState />}><EvaluationDashboard /></Suspense>} />
         <Route path="/settings" element={<Suspense fallback={<LoadingState />}><Settings health={health} refreshHealth={refreshHealth} /></Suspense>} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

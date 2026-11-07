@@ -141,7 +141,7 @@ class SimulatedAgent:
                 "status": "completed",
                 "security_decision": "BLOCK",
                 "proposed_action": action,
-                "tool_executed": False,
+                "tool_executed": True,
                 "tool_result": tool_result,
                 "risk_score": float(output_scan.get("risk_score", 0.0)),
                 "risk_level": "HIGH" if float(output_scan.get("risk_score", 0.0)) >= 0.75 else "MEDIUM",
