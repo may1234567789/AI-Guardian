@@ -1,291 +1,199 @@
-# AI Guardian (SentinelAI)
+# SentinelAI
 
-> **Machine Learning-Powered Security Firewall for AI Agents and LLMs**  
-> *Combines statistical machine learning classifiers, sensitive data detection, and deterministic policy enforcement to mitigate prompt injection and unauthorized autonomous actions.*
+**An ML-powered security framework for detecting prompt injection and enforcing access control in AI agents**
 
-[![Python](https://img.shields.io/badge/Python-3.12-blue.svg)](https://www.python.org/)
-[![License: Apache 2.0](https://img.shields.io/badge/License-Apache_2.0-green.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Status](https://img.shields.io/badge/Status-Day%206%20Security%20Dashboard%20Complete-brightgreen.svg)](#current-implementation-status)
+SentinelAI is an academic prototype that combines a lightweight text classifier, sensitive-data checks, deterministic role-based policies, a FastAPI service, and a React dashboard. Its agent tools operate on synthetic in-memory records only. It is not production-certified and does not guarantee prevention of prompt injection.
 
----
+## Abstract
 
-## 1. Project Background & Objective
+AI agents can process user prompts and untrusted documents before proposing actions through tools. A malicious or misleading instruction can therefore influence model behavior or expose sensitive output. SentinelAI explores a layered defense: a TF-IDF text classifier provides a prompt-injection signal, sensitive-data detectors identify common patterns, and deterministic policy checks decide whether a role may request a named action. A simulated agent and mock tool registry support controlled evaluation without real external actions. The dashboard exposes scans, action authorization checks, event history, and recorded model/evaluation results.
 
-Autonomous AI agents equipped with tool-use capabilities (browsing, shell commands, file system manipulation, API integration) represent a critical paradigm shift in software. However, they introduce profound security risks when untrusted inputs subvert the agent's control flow via **Prompt Injection** (OWASP LLM01:2025).
+## Problem, objectives, and proposed solution
 
-**AI Guardian (SentinelAI)** is designed to act as an inline, low-latency security gateway. Rather than relying solely on probabilistic models or static blocklists, AI Guardian combines:
-1. **Empirically Audited Machine Learning Classifiers:** Fast CPU-friendly baseline models to detect injection and jailbreak payloads in milliseconds.
-2. **Deterministic Security Policies:** Strict capability controls and execution sandboxes that prevent destructive actions even in the event of an ML false negative.
-3. **Sensitive Data Redaction:** Automated detection of credentials, PII, and API keys before prompt submission.
+**Problem.** A classifier alone cannot enforce authorization, while a role policy alone does not identify suspicious instructions or sensitive text. A false positive or false negative is possible in either detector.
 
-> [!WARNING]
-> **Research & Development Notice:** AI Guardian is currently under active development and is **not production-ready**. No claims of total injection prevention or production certification are made at this stage.
+**Objectives.**
 
----
+- Evaluate a small, CPU-friendly prompt-injection classifier.
+- Enforce role/action rules independently of model risk.
+- Require explicit confirmation for destructive mock operations.
+- Scan detected output for sensitive material before returning it from the simulated agent.
+- Record security event metadata and provide a demonstrable dashboard.
 
-## 2. Technology Stack
+**Proposed solution.** Use ML as a signal, not as the authorization authority. The policy engine denies unknown roles, unknown actions, and disallowed role/action pairs. The permission guard and output scanner add separate checks. All mock tools are local and synthetic.
 
-* **Language:** Python (tested on Python 3.14 on Windows 64-bit)
-* **Core Data Processing:** `pandas==3.0.6`, `numpy>=1.26.0`, `pyarrow==25.0.1`
-* **Machine Learning Baselines:** `scikit-learn>=1.3.0`, `joblib>=1.3.0`
-* **Data Sources & Provenance:** Hugging Face `datasets>=2.16.0` (`cyberec/Prompt-injection-dataset`)
-* **Visualization & Reporting:** `matplotlib>=3.8.0`, `seaborn>=0.13.0`
-* **Future Components:** FastAPI (Backend API), React (Security Dashboard), SQLite (Event Audit Logging)
+## Features
 
----
+- TF-IDF + Logistic Regression and Linear SVM experiment pipelines and saved artifacts.
+- Prompt and document scanning, plus sensitive-data detection for prompts and output.
+- Role-based action policy and explicit confirmation for simulated deletion.
+- A simulated agent and allowlisted mock tools; no real email, network, shell, or external database action.
+- FastAPI endpoints, SQLite event metadata, and a React/Vite dashboard.
+- Synthetic Day 8 evaluation results and automated security-invariant tests.
 
-## 3. Project Directory Structure
+## Architecture
 
-```
-SentinelAI/
-├── ml/
-│   ├── data/                   # Verified local Parquet and CSV dataset partitions
-│   │   ├── core_train.parquet
-│   │   ├── core_validation.parquet
-│   │   ├── core_test.parquet
-│   │   └── ...
-│   ├── artifacts/              # Serialized models and vectorizers
-│   │   ├── prompt_injection_logreg.joblib  # Trained TF-IDF + Logistic Regression pipeline
-│   │   ├── prompt_injection_svm.joblib     # Trained TF-IDF + LinearSVC pipeline
-│   │   ├── model_metadata.json             # Day 2 baseline metadata
-│   │   └── svm_model_metadata.json         # Day 3 SVM metadata and validation results
-│   ├── reports/                # Visual charts, markdown analyses, and JSON summaries
-│   │   ├── confusion_matrix.png            # Day 2: Test set confusion matrix heatmap
-│   │   ├── roc_curve.png                   # Day 2: Receiver operating characteristic curve
-│   │   ├── metrics_summary.png             # Day 2: Default vs. calibrated threshold metrics
-│   │   ├── error_analysis.md               # Day 2: In-depth qualitative error audit
-│   │   ├── test_evaluation_summary.json    # Day 2: Complete machine-readable test metrics
-│   │   ├── class_distribution.png          # Day 1: Class distribution breakdown
-│   │   ├── text_length_distribution.png    # Day 1: Text length density plots
-│   │   ├── day3_model_comparison.json      # Day 3: Test metrics and threshold results
-│   │   ├── model_error_comparison.md       # Day 3: Disagreement and error analysis
-│   │   ├── robustness_test_results.md      # Day 3: Synthetic robustness results
-│   │   └── ...
-│   ├── notebooks/              # Exploratory research notebooks
-│   ├── train_svm.py            # Day 3 TF-IDF + LinearSVC training
-│   ├── compare_models.py       # Saved-artifact comparison and visualizations
-│   ├── compare_errors.py       # Cross-model disagreement analysis
-│   ├── robustness_tests.py     # Small, labeled synthetic test suite
-│   ├── preprocess_data.py      # Leakage-safe preprocessing & cross-split isolation
-│   ├── train.py                # Pipeline construction, training, threshold tuning & serialization
-│   ├── evaluate.py             # Held-out test set evaluation & chart generation
-│   ├── error_analysis.py       # Empirical false positive / false negative diagnostic
-│   ├── test_model.py           # Automated model unit & smoke tests (7/7 passing)
-│   ├── inspect_dataset.py      # Schema discovery, null/duplicate checks, leakage audits
-│   ├── analyze_dataset.py      # In-depth EDA, statistical profiling, and visualizations
-│   └── test_data_pipeline.py   # Automated unit tests for inspection & analysis logic
-├── backend/                    # FastAPI security API and SQLite audit log
-├── frontend/                   # React/Vite security dashboard
-├── docs/                       # Research documentation and empirical reports
-│   ├── day1_dataset_report.md  # Day 1 empirical dataset quality audit
-│   ├── day1_research_notes.md  # Day 1 theoretical foundations and threat taxonomy
-│   ├── day2_model_report.md    # Day 2 complete baseline model training and evaluation report
-│   ├── day3_model_comparison.md # Day 3 controlled comparison and limitations
-│   └── day6_frontend_dashboard.md # Day 6 dashboard implementation
-├── requirements.txt            # Pinned, tested dependencies for local environment
-├── .gitignore                  # Git exclusion rules
-└── README.md                   # Project overview and instructions
+The implemented service evaluates action requests but does **not** dispatch a tool from the dashboard. The separate simulated agent is exercised by the evaluation/tests. See the [architecture and workflow diagrams](docs/architecture.md) for this boundary and the ALLOW/BLOCK/REVIEW semantics.
+
+```text
+Browser / React Dashboard
+        │ HTTP (localhost)
+        ▼
+FastAPI API ─────► SecurityService
+                       ├── Prompt-injection model
+                       ├── Sensitive-data detector
+                       ├── Risk engine
+                       └── Deterministic policy / permission guard
+                              │
+                              ├── Authorization result → API response
+                              └── SimulatedAgent (evaluation harness only)
+                                      ├── Registered mock tools
+                                      └── Output security scan
+        │
+        └── SQLite event metadata
 ```
 
----
+## Technologies
 
-## 4. Current Implementation Status (Day 1–Day 6 Complete)
+| Area | Technologies |
+|---|---|
+| API | Python 3.12, FastAPI, Pydantic, SQLAlchemy |
+| ML/data | scikit-learn, TF-IDF, Logistic Regression, LinearSVC, pandas, NumPy, joblib |
+| Persistence | SQLite |
+| Dashboard | React, Vite, React Router, Recharts |
+| Validation | pytest, FastAPI TestClient, Vite production build |
 
-* [x] **Day 1 - Dataset Understanding & Audits:** Schema discovery, data quality inspection (zero nulls, zero empty strings), cross-split leakage audit, length disparity discovery, local Parquet/CSV storage, and 5 visual reports.
-* [x] **Day 2 - Preprocessing Pipeline:** Leakage-safe, security-preserving preprocessing in `ml/preprocess_data.py`. Verified zero cross-split overlap across train, validation, and test partitions.
-* [x] **Day 2 - Baseline ML Model Training:** Built and trained an end-to-end scikit-learn `Pipeline` (TF-IDF Vectorizer with unigrams/bigrams and sublinear TF + Logistic Regression with class balancing) in `ml/train.py`. Fits in 0.136s.
-* [x] **Day 2 - Model Artifact Serialization:** Complete pipeline saved with Joblib to `ml/artifacts/prompt_injection_logreg.joblib` (162.3 KB). Full hyperparameters, split provenance, environment details, and security limitations recorded in `ml/artifacts/model_metadata.json`.
-* [x] **Day 2 - Held-Out Test Set Evaluation:** Evaluated on 942 test examples in `ml/evaluate.py`. Default threshold (0.50) achieved **95.22% accuracy, 97.46% recall, 94.55% precision, 0.9599 F1, and 0.9937 ROC-AUC**.
-* [x] **Day 2 - Validation Threshold Calibration:** Calibrated operating threshold to 0.71, slashing False Positives from 31 down to 7 (FPR = 1.79%, precision = 98.64%, recall = 92.21%).
-* [x] **Day 2 - Latency Profiling:** Verified sub-millisecond CPU inference: **0.452 ms** mean single-request latency, 0.636 ms P95 latency.
-* [x] **Day 2 - Visual Reporting:** Publication-ready charts generated in `ml/reports/`: `confusion_matrix.png`, `roc_curve.png`, and `metrics_summary.png`.
-* [x] **Day 2 - Error Analysis:** In-depth qualitative audit in `ml/reports/error_analysis.md` analyzing false alarms on long benign prompts and bypasses on social-engineering roleplay ("grandma exploit").
-* [x] **Day 2 - Automated Unit Testing:** 7 automated test suites passing in `ml/test_model.py` (model loading, step integrity, predict_proba calibration, batch/single inference, empty input edge cases, and smoke tests).
-* [x] **Day 3 - Linear SVM:** Trained and saved the TF-IDF + LinearSVC pipeline to `ml/artifacts/prompt_injection_svm.joblib`; validation-only threshold analysis and model metadata are saved alongside it.
-* [x] **Day 3 - Controlled Comparison:** Evaluated the saved Logistic Regression and LinearSVC pipelines on the same 942-example `core_test` split; results and charts are in `ml/reports/`.
-* [x] **Day 3 - Errors and Robustness:** Generated cross-model error analysis and executed a separate 30-case synthetic suite; see the report and caveats below.
-* [x] **Day 3 - Tests and Research Report:** SVM and Logistic Regression artifact tests pass; see `docs/day3_model_comparison.md`.
-* [x] **Day 4 - Deterministic Policy Engine:** Added role-based permissions, action requirements, and security policy evaluation in `backend/security/`.
-* [x] **Day 5 - FastAPI Backend & Audit Logging:** Built the backend API, request models, SQLite event logging, integration with the existing security engine, and route validation for scan/gating/action flows.
-* [x] **Day 6 - Security Dashboard:** Built a responsive React/Vite dashboard with overview statistics, prompt and output scans, backend action-policy checks, event browsing, historical model results, and API settings.
+## ML methodology, dataset, and recorded results
 
----
+The experiments use the `core` configuration of the [cyberec Prompt-injection-dataset](https://huggingface.co/datasets/cyberec/Prompt-injection-dataset), with the provided train/validation/test splits. The checked-in `ml/data/` directory contains CSV and Parquet partitions; preprocessing preserves punctuation and security-related words. TF-IDF uses unigrams and bigrams, `min_df=2`, up to 20,000 features, and sublinear term frequency. The Logistic Regression and LinearSVC pipelines use class-balanced weights. Threshold selection is based on validation data; test results are reported separately.
 
-## 5. Measured Baseline Performance (Day 2 Empirical Results)
+The existing Day 3 comparison reports 942 held-out test rows. At the default boundaries, Logistic Regression achieved 95.22% accuracy, 94.55% precision, 97.46% recall, 0.9599 F1, and 0.9937 ROC-AUC; LinearSVC achieved 95.22%, 94.71%, 97.28%, 0.9598, and 0.9943 respectively. The validation-selected SVM boundary is a **decision score**, not a probability. The API exposes the raw SVM decision score separately and uses a bounded monotonic normalization for risk aggregation; that normalized score is not a calibrated probability. These are historical experiment results, not a fresh benchmark from this Day 9 preparation. See [Day 3 model comparison](docs/day3_model_comparison.md) and [Day 8 evaluation](docs/day8_security_evaluation.md) for methods, confusion matrices, and caveats.
 
-Evaluated strictly on the held-out test split (`core_test.parquet`, $N = 942$: 390 Benign, 552 Malicious):
+Day 8's synthetic 130-scenario evaluation reports 98.3% attack detection and 100% unauthorized-action prevention for its ML-plus-policy configuration, alongside an 80% false-positive rate and 52% legitimate-task completion. These synthetic scenario results are not production effectiveness estimates; labels are hand-authored and require human review. Full denominators and definitions are in the report.
 
-| Metric | Default Threshold (0.50) | Validation-Calibrated Threshold (0.71) | Security Impact |
-| :--- | :--- | :--- | :--- |
-| **Accuracy** | **95.22%** | **94.69%** | Robust baseline accuracy across both splits |
-| **Precision** | **94.55%** | **98.64%** | Calibrated threshold minimizes user friction |
-| **Recall (Detection Rate)** | **97.46%** (538 / 552) | **92.21%** (509 / 552) | Default captures 97.5% of attack attempts |
-| **F1-Score** | **0.9599** | **0.9532** | Strong harmonic performance |
-| **ROC-AUC** | **0.9937** | **0.9937** | Excellent class separability |
-| **False Positive Rate (FPR)** | **7.95%** (31 / 390) | **1.79%** (7 / 390) | **77.4% reduction in false alarms** |
-| **False Negative Rate (FNR)** | **2.54%** (14 / 552) | **7.79%** (43 / 552) | Trade-off for enterprise low-friction profile |
-| **Single-Request Mean Latency** | **0.452 ms** | **0.452 ms** | Sub-millisecond CPU inline inspection |
-| **Single-Request P95 Latency** | **0.636 ms** | **0.636 ms** | Deterministic tail latency on commodity CPU |
+## Security workflow
 
----
+1. Validate request shape and length at the API boundary.
+2. Analyze prompt/document content with the ML detector and sensitive-data detector.
+3. Evaluate the named role/action against deterministic policy.
+4. Deny a policy failure regardless of ML score; do not execute on REVIEW.
+5. For simulated-agent tests, invoke only a registered mock tool after authorization.
+6. Scan mock output before returning it; replace detected output matches.
+7. Persist event metadata, not the complete prompt or output.
 
-## 6. Day 3 Model Comparison
+The API's role is caller-supplied mock context, **not authenticated identity**. See [known limitations](#limitations).
 
-The saved Day 2 Logistic Regression artifact and the Day 3 LinearSVC artifact were compared on the identical official `core_test` split (942 examples: 390 benign, 552 malicious). Both artifact metadata records 4,391 training rows from `core_train`; exact text and `group_id` overlap across official splits was checked and found to be zero. No baseline model or Day 2 evaluation report was overwritten.
+## API overview
 
-### Default test-set metrics
+Run the API locally and open `http://127.0.0.1:8000/docs` for the generated OpenAPI page.
 
-| Metric | Logistic Regression | Linear SVM |
-| :--- | ---: | ---: |
-| Accuracy | 95.22% | 95.22% |
-| Precision | 94.55% | 94.71% |
-| Recall | 97.46% | 97.28% |
-| F1 | 0.9599 | 0.9598 |
-| False-positive rate | 7.95% (31/390) | 7.69% (30/390) |
-| False-negative rate | 2.54% (14/552) | 2.72% (15/552) |
-| ROC-AUC | 0.9937 | 0.9943 |
-| Training duration (recorded) | 0.1359 s | 0.9247 s |
-| Mean single-request latency (this comparison run) | 3.739 ms | 3.886 ms |
-| P95 single-request latency (this comparison run) | 6.179 ms | 7.173 ms |
-| Saved artifact size | 162.3 KiB | 150.4 KiB |
+| Method | Path | Purpose |
+|---|---|---|
+| GET | `/` | API status banner |
+| GET | `/health` | Database, engine, and model status |
+| POST | `/scan` | Prompt and sensitive-input analysis |
+| POST | `/scan-output` | Sensitive output scan and redaction |
+| POST | `/scan-document` | Untrusted document analysis |
+| POST | `/check-action` | Authorization evaluation and event record; does not execute tools |
+| GET | `/events` | Filtered/paginated security event metadata |
+| GET | `/events/{request_id}` | Event lookup |
+| GET | `/stats` | Aggregate event counts |
+| GET | `/evaluation/summary` | Existing synthetic evaluation summary |
 
-Validation-selected thresholds maximized F1 on `core_validation` only: Logistic Regression threshold **0.7102** and SVM decision-score threshold **0.0300**. On the untouched test set these yielded, respectively, LR F1 **0.9532** (7 FP, 43 FN) and SVM F1 **0.9606** (29 FP, 15 FN). SVM decision scores are not probabilities. Latency is hardware/load-sensitive; use the same-run values above for comparison rather than the earlier Day 2 profiling result.
+## Windows installation and run
 
-| Model at validation-selected threshold | Test accuracy | Precision | Recall | F1 | FP / FN |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| Logistic Regression (0.7102 probability) | 94.69% | 98.64% | 92.21% | 0.9532 | 7 / 43 |
-| Linear SVM (0.0300 decision score) | 95.33% | 94.88% | 97.28% | 0.9606 | 29 / 15 |
+Use Python 3.12 (the repository's recorded FastAPI environment) and Node.js/npm. The checked-in ML artifacts are loaded at runtime; training is optional.
 
-The models tie on accuracy and near-tie on F1. SVM reduces one default-threshold false positive but adds one false negative; measured ROC-AUC is slightly higher, while the Logistic Regression artifact trains faster. There is no evidence here of a decisive winner. Full methods, charts, errors, synthetic test findings, and limitations are in [docs/day3_model_comparison.md](docs/day3_model_comparison.md).
-
-### Day 3 commands
+From the repository root in PowerShell:
 
 ```powershell
-python ml\train_svm.py --config core --max-features 20000 --ngram-min 1 --ngram-max 2 --c-reg 1.0 --class-weight balanced --random-state 42
-python ml\compare_models.py --config core
-python ml\compare_errors.py --config core
-python ml\robustness_tests.py
-python -m unittest ml/test_svm.py ml/test_model.py
+py -3.12 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+Copy-Item .env.example frontend\.env.local
 ```
 
-Default comparison outputs are saved in `ml/reports/`. The `LinearSVC.decision_function()` score is a signed distance from the learned boundary, not an attack-probability percentage.
-
----
-
-## 7. Setup & Execution Instructions
-
-### Prerequisites
-* Windows 10/11, Linux, or macOS
-* Python 3.12.x (verified working in the local environment; Python 3.14 had dependency build issues with the FastAPI/Pydantic stack)
-* 4 GB+ RAM (optimized for Intel Core i3 / 8 GB RAM systems; no GPU required)
-
-### Step 1: Clone or Navigate to the Repository
-```bash
-cd SentinelAI
-```
-
-### Step 2: Create and Activate Virtual Environment
-```powershell
-# Windows PowerShell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-
-# Linux / macOS
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Step 3: Install Required Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### Step 4: Run Data Preprocessing & Leakage Verification
-```bash
-python ml/preprocess_data.py --config core
-```
-
-### Step 5: Train Baseline Model & Save Artifacts
-```bash
-python ml/train.py --config core --max-features 20000 --random-state 42
-```
-*Artifacts saved to `ml/artifacts/prompt_injection_logreg.joblib` and `ml/artifacts/model_metadata.json`.*
-
-### Step 6: Evaluate Model on Held-Out Test Set
-```bash
-python ml/evaluate.py --config core
-```
-*Visual charts and metrics saved to `ml/reports/`.*
-
-### Step 7: Run Qualitative Error Analysis
-```bash
-python ml/error_analysis.py --config core
-```
-*Report saved to `ml/reports/error_analysis.md`.*
-
-### Step 8: Start the FastAPI Backend
-```powershell
-# from the repo root
-$env:PYTHONPATH = "."
-.\venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
-```
-
-Visit:
-- `http://127.0.0.1:8000/`
-- `http://127.0.0.1:8000/docs`
-- `http://127.0.0.1:8000/openapi.json`
-
-### Step 9: Run Backend Validation Tests
-```bash
-$env:PYTHONPATH = "."
-.\venv\Scripts\python.exe -m pytest backend -q
-```
-This includes the Day 8 evaluation invariant and summary-endpoint tests.
-
-### Step 10: Start the SentinelAI Dashboard
-
-In another terminal:
+In the first PowerShell terminal, start the backend from the repository root:
 
 ```powershell
-cd frontend
-npm install
+python -m uvicorn backend.main:app --host 127.0.0.1 --port 8000
+```
+
+In a second terminal:
+
+```powershell
+Set-Location frontend
+npm ci
 npm run dev
 ```
 
-Open the dashboard at `http://127.0.0.1:5173`. The dashboard uses the local API at `http://127.0.0.1:8000` by default. Keep the backend running in its own terminal. You may set `VITE_API_BASE_URL` in `frontend/.env.local` before starting Vite to use a different backend URL; the Settings page can also update the URL for the current browser.
+Open the dashboard at `http://127.0.0.1:5173`, API health at `http://127.0.0.1:8000/health`, and API docs at `http://127.0.0.1:8000/docs`. The API binds to loopback for local demonstration. For an existing `venv`, activate that environment instead of creating `.venv`.
 
-The dashboard provides API-backed overview and event data, prompt scanning, data-leak scanning, action authorization evaluation, historical model comparisons, and connection settings. The role selector is a mock development identity; it is not production authentication.
+## Testing and model commands
 
----
+From the repository root:
 
-## 8. Day 5 Acceptance Checklist
+```powershell
+python -m pytest backend ml -q
+```
 
-* [x] Backend package structure created under `backend/`.
-* [x] Existing Day 4 security modules reused rather than duplicated.
-* [x] FastAPI app boots with database and model initialization.
-* [x] `/scan`, `/scan-output`, `/scan-document` endpoints return structured decisions and risk scores.
-* [x] `/check-action` end-to-end evaluation includes policy + ML + leak gating.
-* [x] `/events` and `/events/{request_id}` expose persisted audit events.
-* [x] `/stats` returns aggregate counts by decision.
-* [x] `/health` confirms DB and model status.
-* [x] SQLite event persistence created and verified with TestClient.
-* [x] Targeted backend test suite passes (`30 passed`).
-* [x] Live API docs and OpenAPI JSON are available from the running app.
+Build the dashboard:
 
----
+```powershell
+Set-Location frontend
+npm ci
+npm run build
+```
 
-## 9. Planned Development Stages
+Optional model workflow (uses checked-in data; training overwrites the corresponding model artifact and metadata):
 
-* [x] **Day 1 (Completed):** Dataset inspection, data quality audits, leakage detection, empirical profiling, and documentation.
-* [x] **Day 2 (Completed):** Data preprocessing, TF-IDF feature extraction, length-bias mitigation, Logistic Regression baseline training, held-out test evaluation, validation threshold calibration, error analysis, and unit testing.
-* [x] **Day 3 (Completed):** TF-IDF + LinearSVC training, saved-artifact comparison, validation-only threshold analysis, error analysis, synthetic robustness tests, and documentation.
-* [x] **Day 4 (Completed):** Deterministic security policy engine (least privilege, capability sandboxing, and human authorization for sensitive actions).
-* [x] **Day 5 (Completed):** FastAPI backend, audit log persistence, API validation, and live docs startup checks.
-* [x] **Day 6 (Completed):** Responsive React dashboard, API integration, event monitoring, model-performance reporting, and frontend setup documentation.
-* [x] **Day 8 (Completed):** Synthetic E1-E4 evaluation, security invariant tests, raw results, failure analysis, charts, evaluation report, and results-backed dashboard. See [backend/evaluation/README.md](backend/evaluation/README.md).
-* [ ] **Future:** Additional character n-gram robustness experiments, calibrated ensemble evaluation, API gateway, and adaptive red-teaming.
+```powershell
+Set-Location ..
+python ml\preprocess_data.py --config core
+python ml\train.py --config core --max-features 20000 --random-state 42
+python ml\evaluate.py --config core
+```
 
----
+## Screenshots
 
-## 10. License
-This project is licensed under the Apache License 2.0. Dataset sourced from `cyberec/Prompt-injection-dataset` under Apache 2.0.
+Genuine local dashboard captures are in [docs/screenshots/](docs/screenshots/): overview, prompt-injection result, viewer action denial, sensitive-data scan, security events, and historical model performance. The overview/event counts reflect synthetic/test records in the local SQLite database. The simulated agent has no dashboard execution page, so its terminal demonstration is not represented by a screenshot. See the [capture notes](docs/screenshots/README.md).
+
+## Results and observations
+
+- The existing held-out model comparison is documented in `docs/day3_model_comparison.md`; Day 8 synthetic evaluation is documented in `docs/day8_security_evaluation.md`.
+- The current source test suite and dashboard build are rerun as part of this preparation; see [release readiness](docs/day9_release_readiness.md) for actual run results.
+- Synthetic results show a trade-off between attack detection and legitimate-task completion. The classifier is not a standalone security boundary.
+
+## Limitations
+
+- Academic prototype only; no production authentication, user/session authorization, deployment hardening, or production monitoring.
+- Prompt-injection detection is statistical and can miss novel or context-dependent attacks; no guarantee of comprehensive prevention.
+- Mock identities and tools are demonstrative only. The `/check-action` API evaluates and logs; it does not run the simulated tools.
+- Sensitive-data matching is pattern-based and cannot identify every secret or every context.
+- SQLite is suitable for the local demo, not a production audit service. Event records use mock identity text provided by the caller.
+- Day 8 scenario labels are synthetic assumptions, not an independently adjudicated real-world test set.
+- The dashboard's model-performance view is historical reporting, not a live benchmark.
+- The project repository does not include a project license. Do not assume the dataset's license applies to this code.
+
+## Future scope
+
+Independent review of scenario labels, broader and context-aware evaluation, authenticated identity and server-side authorization, configurable retention, stronger output handling, deployment controls, and safe integration tests for a real agent in an isolated environment.
+
+## References
+
+1. Dataset: [cyberec/Prompt-injection-dataset](https://huggingface.co/datasets/cyberec/Prompt-injection-dataset); local provenance and split audit: [Day 1 dataset report](docs/day1_dataset_report.md).
+2. OWASP, [Top 10 for Large Language Model Applications](https://owasp.org/www-project-top-10-for-large-language-model-applications/).
+3. Greshake et al., [“Not what you've signed up for: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection”](https://arxiv.org/abs/2302.12173), arXiv:2302.12173, 2023.
+4. Salton and Buckley, “Term-weighting approaches in automatic text retrieval,” *Information Processing & Management*, 24(5), 513–523, 1988, [doi:10.1016/0306-4573(88)90021-0](https://doi.org/10.1016/0306-4573(88)90021-0).
+5. Scikit-learn documentation: [text feature extraction](https://scikit-learn.org/stable/modules/feature_extraction.html#text-feature-extraction), [LogisticRegression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), and [LinearSVC](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html).
+6. Sandhu et al., “Role-Based Access Control Models,” *Computer*, 29(2), 38–47, 1996, [doi:10.1109/2.485845](https://doi.org/10.1109/2.485845).
+7. Official documentation: [FastAPI](https://fastapi.tiangolo.com/), [React](https://react.dev/), [Vite](https://vite.dev/), and [SQLite](https://www.sqlite.org/).
+
+## Additional submission documents
+
+- [Project audit](docs/day9_project_audit.md)
+- [Final report support](docs/final_project_report.md)
+- [Architecture diagrams](docs/architecture.md)
+- [5–7 minute demo script](docs/day9_demo_script.md)
+- [Release readiness and verification](docs/day9_release_readiness.md)

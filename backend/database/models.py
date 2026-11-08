@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 from sqlalchemy import Boolean, Column, Float, Integer, String, Text, DateTime
 from sqlalchemy.orm import declarative_base
-from datetime import datetime
 
 Base = declarative_base()
+
+
+def utc_now_naive() -> datetime:
+    return datetime.now(timezone.utc).replace(tzinfo=None)
 
 
 class SecurityEvent(Base):
@@ -12,7 +17,7 @@ class SecurityEvent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     request_id = Column(String(64), unique=True, index=True, nullable=False)
-    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = Column(DateTime, default=utc_now_naive, nullable=False)
     event_type = Column(String(64), nullable=False)
     pseudonymous_user_id = Column(String(64), nullable=False, default="mock-user")
     user_role = Column(String(32), nullable=True)

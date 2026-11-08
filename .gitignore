@@ -32,6 +32,14 @@ env/
 ENV/
 .venv/
 
+# Local environment variables (keep safe examples versioned)
+.env
+.env.*
+!.env.example
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints
 

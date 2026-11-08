@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from sqlalchemy.orm import Session
 
 from backend.database.database import SessionLocal
-from backend.database.models import SecurityEvent
+from backend.database.models import SecurityEvent, utc_now_naive
 
 
 class EventService:
@@ -30,7 +29,7 @@ class EventService:
     ) -> SecurityEvent:
         event = SecurityEvent(
             request_id=request_id,
-            timestamp=datetime.utcnow(),
+            timestamp=utc_now_naive(),
             event_type=event_type,
             pseudonymous_user_id=pseudonymous_user_id,
             user_role=user_role,

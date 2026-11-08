@@ -46,3 +46,19 @@ def test_scan_output_email_detection():
     body = response.json()
     assert body['decision'] in {'ALLOW', 'REVIEW', 'BLOCK'}
     assert 'REDACTED' in body['redacted_text'] or body['findings'] == []
+
+
+def test_scan_output_never_returns_sensitive_matches():
+    email = "alice.smith@example.com"
+    dummy_value = "sk_test_" + "EXAMPLE1234567890"
+    text = f"Contact {email} or {email}; token: {dummy_value}."
+
+    response = client.post('/scan-output', json={'output_text': text})
+
+    assert response.status_code == 200
+    body = response.json()
+    serialized = response.text
+    assert email not in serialized
+    assert dummy_value not in serialized
+    assert body["redacted_text"].count("[REDACTED]") >= 3
+    assert all("examples" not in finding for finding in body["findings"])

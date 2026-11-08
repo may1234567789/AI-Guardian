@@ -105,7 +105,13 @@ class PromptDetector:
             if method == "decision_function":
                 predicted_label = "prompt_injection" if score >= self.threshold else "benign"
                 suspicious = score >= self.threshold
-                risk_score = float(score)
+                decision_score = float(score)
+                if decision_score >= 0:
+                    risk_score = 1.0 / (1.0 + math.exp(-decision_score))
+                else:
+                    exp_score = math.exp(decision_score)
+                    risk_score = exp_score / (1.0 + exp_score)
+                score_type = "normalized_decision_score"
                 reason = (
                     "Malicious score exceeds the Day 3 validation-selected decision threshold "
                     f"({self.threshold:.4f}) for the Linear SVM model."
@@ -117,6 +123,8 @@ class PromptDetector:
                 predicted_label = "prompt_injection" if probability >= self.threshold else "benign"
                 suspicious = probability >= self.threshold
                 risk_score = probability
+                decision_score = None
+                score_type = "probability"
                 reason = (
                     f"ML probability score {probability:.4f} exceeds the validated threshold {self.threshold:.4f}."
                     if suspicious
@@ -127,9 +135,12 @@ class PromptDetector:
                 "is_suspicious": suspicious,
                 "predicted_label": predicted_label,
                 "risk_score": round(risk_score, 6),
+                "score_type": score_type,
                 "model_name": self.model_path.name,
                 "detection_reason": reason,
             }
+            if decision_score is not None:
+                result["decision_score"] = round(decision_score, 6)
             results.append(result)
 
         return results[0] if len(results) == 1 else results

@@ -45,7 +45,7 @@ The backend CORS allowlist includes both `http://localhost:5173` and `http://127
 
 - The role selector submits a mock development identity and is not authentication. Backend policy remains authoritative.
 - The dashboard does not execute proposed actions or edit backend policies.
-- Output-scan findings can include raw examples in the API response. The UI intentionally omits those fields and displays only category/count information and fixed redaction placeholders.
+- At the time of the Day 6 report, output-scan findings could include raw examples, so the UI omitted them. Day 9 changed the API to return finding categories/counts only and redact every matched value before responding; a regression test covers this behavior.
 - The backend event endpoint provides offset pagination but no total matching-record count; the UI therefore shows the current page size rather than a fabricated total.
 - The model page is historical experiment reporting, not a live benchmark. It uses `ml/reports/day3_model_comparison.json` measured results represented in `frontend/src/data/modelMetrics.json`.
 - No screenshots are versioned; the dashboard was also checked in a local browser at desktop and mobile widths.

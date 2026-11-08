@@ -34,7 +34,7 @@ export default function DataLeakScanner() {
   return (
     <>
       <PageTitle eyebrow="DATA PROTECTION" title="Data leak scanner" description="Check generated text for sensitive patterns before delivery. Only the local backend receives the submitted content." />
-      <div className="notice notice-amber"><ShieldAlert size={17} /><span><strong>Values are withheld.</strong> The API can return raw examples; this page displays only finding categories, counts, and redaction placeholders.</span></div>
+      <div className="notice notice-amber"><ShieldAlert size={17} /><span><strong>Values are withheld.</strong> The backend returns finding categories and counts and redacts detected values before responding.</span></div>
       <div className="example-row"><span>Synthetic examples</span>{EXAMPLES.map(([label, value]) => <button className="example-chip" key={label} onClick={() => { setText(value); setResult(null); setError(""); }}>{label}</button>)}</div>
       <form className="panel form-panel" onSubmit={submit}>
         <label htmlFor="output-text">Text to inspect</label>
@@ -45,7 +45,7 @@ export default function DataLeakScanner() {
       </form>
       {result && <div className="result-stack">
         <ScorePanel result={result} />
-        <div className="two-column"><section className="panel detail-panel"><h3>Sensitive-data findings</h3><div className="detail-row"><span>Detected</span><strong>{result.findings?.length ? "Yes" : "No"}</strong></div><div className="detail-row"><span>Finding categories</span><strong>{result.findings?.length || 0}</strong></div><div className="finding-list">{(result.findings || []).map((finding) => <div className="finding-item" key={finding.type}><div><strong>{finding.type}</strong><span>{finding.count} match{finding.count === 1 ? "" : "es"}</span></div><code>[REDACTED {finding.type}]</code></div>)}{!result.findings?.length && <span className="muted">No sensitive patterns detected.</span>}</div><p className="muted">Raw examples returned by the API are intentionally not rendered.</p></section>
+        <div className="two-column">        <section className="panel detail-panel"><h3>Sensitive-data findings</h3><div className="detail-row"><span>Detected</span><strong>{result.findings?.length ? "Yes" : "No"}</strong></div><div className="detail-row"><span>Finding categories</span><strong>{result.findings?.length || 0}</strong></div><div className="finding-list">{(result.findings || []).map((finding) => <div className="finding-item" key={finding.type}><div><strong>{finding.type}</strong><span>{finding.count} match{finding.count === 1 ? "" : "es"}</span></div><code>[REDACTED {finding.type}]</code></div>)}{!result.findings?.length && <span className="muted">No sensitive patterns detected.</span>}</div><p className="muted">The API does not include raw matched examples in its response.</p></section>
           <section className="panel detail-panel"><h3>Risk assessment</h3><div className="detail-row"><span>Decision</span><DecisionBadge value={result.decision} /></div><div className="detail-row"><span>Risk level</span><RiskBadge value={result.risk_level} /></div><div className="detail-row"><span>Risk score</span><strong>{Number(result.risk_score).toFixed(2)}</strong></div><ul className="reason-list">{(result.reasons || []).map((reason) => <li key={reason}>{reason}</li>)}</ul></section></div>
       </div>}
     </>

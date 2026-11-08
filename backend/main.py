@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 from typing import AsyncIterator
 
@@ -15,6 +16,8 @@ from backend.api.stats import router as stats_router
 from backend.database.database import create_db_and_tables
 from backend.services.security_service import SecurityService
 
+
+logger = logging.getLogger(__name__)
 
 create_db_and_tables()
 
@@ -56,7 +59,8 @@ def health() -> dict:
 
     try:
         create_db_and_tables()
-    except Exception:
+    except Exception as exc:
+        logger.error("Database health check failed (%s).", type(exc).__name__)
         db_ok = False
 
     try:
@@ -66,14 +70,16 @@ def health() -> dict:
             app.state.security_service = service
         if not hasattr(service, "prompt_detector"):
             security_ok = False
-    except Exception:
+    except Exception as exc:
+        logger.error("Security engine health check failed (%s).", type(exc).__name__)
         security_ok = False
 
     try:
         service = getattr(app.state, "security_service", None) or SecurityService()
         if service is not None:
             service.prompt_detector.detect("Please summarize the quarterly sales report.")
-    except Exception:
+    except Exception as exc:
+        logger.error("ML model health check failed (%s).", type(exc).__name__)
         model_ok = False
 
     version = getattr(app.state, "app_version", "1.0.0")
@@ -88,6 +94,12 @@ def health() -> dict:
 
 @app.exception_handler(Exception)
 async def handle_unexpected_exception(request: Request, exc: Exception):
+    logger.error(
+        "Unhandled API error for %s %s (%s).",
+        request.method,
+        request.url.path,
+        type(exc).__name__,
+    )
     return JSONResponse(
         status_code=500,
         content={"error": "An internal server error occurred.", "message": "Please check the request and try again."},

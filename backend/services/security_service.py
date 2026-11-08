@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import uuid
 from typing import Any, Dict, List
 
@@ -130,14 +131,11 @@ class SecurityService:
             "API_KEY": r"(?i)(?:api[_-]?key|token|secret|password|access[_-]?key)[\s:=\"']+([A-Za-z0-9_\-]{12,})",
             "CONFIDENTIAL": r"(?i)(?:customer id|ssn|secret|private key|password)",
         }.items():
-            matches = []
-            compiled = __import__("re").compile(pattern)
-            for match in compiled.finditer(output_text):
-                matches.append(match.group(0))
+            compiled = re.compile(pattern)
+            matches = list(compiled.finditer(output_text))
             if matches:
-                findings.append({"type": label, "count": len(matches), "examples": matches[:3]})
-                for sample in matches[:3]:
-                    redacted_text = redacted_text.replace(sample, "[REDACTED]")
+                findings.append({"type": label, "count": len(matches)})
+                redacted_text = compiled.sub("[REDACTED]", redacted_text)
 
         risk_score = min(1.0, len(findings) * 0.4)
         if risk_score >= 0.8:
