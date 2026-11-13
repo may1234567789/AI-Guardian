@@ -190,10 +190,3 @@ Independent review of scenario labels, broader and context-aware evaluation, aut
 6. Sandhu et al., “Role-Based Access Control Models,” *Computer*, 29(2), 38–47, 1996, [doi:10.1109/2.485845](https://doi.org/10.1109/2.485845).
 7. Official documentation: [FastAPI](https://fastapi.tiangolo.com/), [React](https://react.dev/), [Vite](https://vite.dev/), and [SQLite](https://www.sqlite.org/).
 
-## Additional submission documents
-
-- [Project audit](docs/day9_project_audit.md)
-- [Final report support](docs/final_project_report.md)
-- [Architecture diagrams](docs/architecture.md)
-- [5–7 minute demo script](docs/day9_demo_script.md)
-- [Release readiness and verification](docs/day9_release_readiness.md)

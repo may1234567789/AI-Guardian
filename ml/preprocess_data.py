@@ -10,7 +10,10 @@ Key Principles:
 - Enforces strict cross-split isolation to prevent data leakage.
 """
 
+from __future__ import annotations
+
 import argparse
+import math
 import os
 import sys
 from typing import Any, Dict, Optional, Tuple
@@ -21,7 +24,6 @@ if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
 import numpy as np
-import pandas as pd
 
 
 LABEL_MAPPING = {
@@ -57,7 +59,11 @@ def clean_text(text: Any) -> str:
     - Casing / formatting structure.
     - Command keywords ('ignore', 'system', 'override', 'eval').
     """
-    if text is None or pd.isna(text):
+    if text is None:
+        return ""
+    if isinstance(text, (float, np.floating)) and math.isnan(text):
+        return ""
+    if type(text).__module__.startswith("pandas.") and type(text).__name__ in {"NAType", "NaTType"}:
         return ""
     if not isinstance(text, str):
         text = str(text)
@@ -74,6 +80,8 @@ def validate_split(
     """
     Validates a dataset split for nulls, empty strings, valid labels, and duplicates.
     """
+    import pandas as pd
+
     if text_col not in df.columns:
         raise ValueError(f"Split '{split_name}' missing text column '{text_col}'.")
     if label_col not in df.columns:
@@ -127,6 +135,8 @@ def preprocess_dataframe(
     Returns:
         (preprocessed_df, audit_log)
     """
+    import pandas as pd
+
     initial_count = len(df)
     audit = {
         "initial_count": initial_count,
@@ -179,6 +189,8 @@ def load_split_data(
     """
     Loads a dataset partition from local Parquet or CSV.
     """
+    import pandas as pd
+
     parquet_path = os.path.join(data_dir, f"{config}_{split}.parquet")
     csv_path = os.path.join(data_dir, f"{config}_{split}.csv")
 

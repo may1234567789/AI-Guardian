@@ -10,6 +10,7 @@
         "precision": 0.9455,
         "recall": 0.9746,
         "f1": 0.9599,
+        "confusionMatrix": { "tn": 359, "fp": 31, "fn": 14, "tp": 538 },
         "falsePositiveRate": 0.0795,
         "falseNegativeRate": 0.0254,
         "rocAuc": 0.9937,
@@ -24,6 +25,7 @@
         "precision": 0.9864,
         "recall": 0.9221,
         "f1": 0.9532,
+        "confusionMatrix": { "tn": 383, "fp": 7, "fn": 43, "tp": 509 },
         "falsePositiveRate": 0.0179,
         "falseNegativeRate": 0.0779
       }
@@ -36,6 +38,7 @@
         "precision": 0.9471,
         "recall": 0.9728,
         "f1": 0.9598,
+        "confusionMatrix": { "tn": 360, "fp": 30, "fn": 15, "tp": 537 },
         "falsePositiveRate": 0.0769,
         "falseNegativeRate": 0.0272,
         "rocAuc": 0.9943,
@@ -50,6 +53,7 @@
         "precision": 0.9488,
         "recall": 0.9728,
         "f1": 0.9606,
+        "confusionMatrix": { "tn": 361, "fp": 29, "fn": 15, "tp": 537 },
         "falsePositiveRate": 0.0744,
         "falseNegativeRate": 0.0272
       }

@@ -20,9 +20,9 @@ export function PageTitle({ eyebrow, title, description, action }) {
 export function ScorePanel({ result }) {
   return (
     <section className="result-panel">
-      <div className="result-heading"><div><span className="eyebrow">Analysis result</span><h2>Security assessment</h2></div><div className="result-badges"><RiskBadge value={result.risk_level} /><DecisionBadge value={result.decision} /></div></div>
+      <div className="result-heading"><div><span className="eyebrow">BACKEND ASSESSMENT</span><h2>Security decision</h2></div><div className="result-badges"><RiskBadge value={result.risk_level} /><DecisionBadge value={result.decision} /></div></div>
       <div className="score-grid">
-        <div className="score-number"><span>Risk score</span><strong>{Number(result.risk_score).toFixed(2)}</strong><div className="score-track"><i style={{ width: `${Math.min(100, Math.max(0, Number(result.risk_score) * 100))}%` }} /></div></div>
+        <div className="score-number"><span>Aggregated backend risk score · not a probability</span><strong>{Number(result.risk_score).toFixed(2)}</strong><div className="score-track"><i style={{ width: `${Math.min(100, Math.max(0, Number(result.risk_score) * 100))}%` }} /></div></div>
         <div><span className="muted-label">Request ID</span><code>{result.request_id}</code></div>
       </div>
       {result.explanation && <p className="result-explanation">{result.explanation}</p>}

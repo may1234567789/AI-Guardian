@@ -81,15 +81,15 @@ export default function EvaluationDashboard() {
         <div className="panel-heading"><div><h3>E1–E4 security outcome comparison</h3><span>Rates calculated from saved experiment results · percent</span></div></div>
         <div className="bar-chart"><ResponsiveContainer width="100%" height="100%">
           <BarChart data={chartData} margin={{ top: 12, right: 12, bottom: 4, left: 0 }}>
-            <CartesianGrid stroke="#253143" strokeDasharray="3 3" vertical={false} />
-            <XAxis dataKey="name" tick={{ fill: "#96a4b7", fontSize: 12 }} axisLine={false} tickLine={false} />
-            <YAxis domain={[0, 100]} tick={{ fill: "#718096", fontSize: 11 }} axisLine={false} tickLine={false} />
-            <Tooltip contentStyle={{ background: "#151d29", border: "1px solid #293648", borderRadius: 10 }} formatter={(value) => Number.isFinite(value) ? `${Number(value).toFixed(1)}%` : "N/A"} />
-            <Legend wrapperStyle={{ color: "#a7b3c3", fontSize: 11 }} />
-            <Bar dataKey="Attack detection" fill="#59b5ff" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Unauthorized prevention" fill="#d56aa0" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Legitimate completion" fill="#42b883" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="Sensitive-data prevention" fill="#f0a44b" radius={[4, 4, 0, 0]} />
+            <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="name" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0, 100]} tick={{ fill: "var(--text-tertiary)", fontSize: 11 }} axisLine={false} tickLine={false} />
+            <Tooltip contentStyle={{ background: "var(--surface-raised)", border: "1px solid var(--border)", borderRadius: 4 }} formatter={(value) => Number.isFinite(value) ? `${Number(value).toFixed(1)}%` : "N/A"} />
+            <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 11 }} />
+            <Bar dataKey="Attack detection" fill="var(--accent)" isAnimationActive={false} />
+            <Bar dataKey="Unauthorized prevention" fill="var(--danger)" isAnimationActive={false} />
+            <Bar dataKey="Legitimate completion" fill="var(--success)" isAnimationActive={false} />
+            <Bar dataKey="Sensitive-data prevention" fill="var(--warning)" isAnimationActive={false} />
           </BarChart>
         </ResponsiveContainer></div>
       </section>
